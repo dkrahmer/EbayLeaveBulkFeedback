@@ -135,12 +135,12 @@ namespace ebayLeaveFeedbackForSellers
 			ListViewItem listViewItem;
 			if (_items.TryGetValue(itemId, out listViewItem))
 			{
-				if (updates.Status != null)			listViewItem.SubItems[0].Text = updates.Status;
-				//if (updates.ItemId != null)			listViewItem.SubItems[1].Text = updates.ItemId;
-				if (updates.Title != null)			listViewItem.SubItems[2].Text = updates.Title;
-				if (updates.Seller != null)			listViewItem.SubItems[3].Text = updates.Seller;
-				if (updates.FeedbackLeft != null)	listViewItem.SubItems[4].Text = updates.FeedbackLeft;
-				if (updates.Result != null)			listViewItem.SubItems[5].Text = updates.Result;
+				if (updates.Status != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[0].Text = updates.Status; }));
+				//if (updates.ItemId != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[1].Text = updates.ItemId; }));
+				if (updates.Title != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[2].Text = updates.Title; }));
+				if (updates.Seller != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[3].Text = updates.Seller; }));
+				if (updates.FeedbackLeft != null)	Invoke((MethodInvoker)(() => { listViewItem.SubItems[4].Text = updates.FeedbackLeft; }));
+				if (updates.Result != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[5].Text = updates.Result; }));
 			}
 		}
 

@@ -71,6 +71,8 @@ namespace ebayLeaveFeedbackForSellers
 
 				Invoke((MethodInvoker)(() => { listViewItems.Items.Add(listViewItem); }));
 			}
+
+			Invoke((MethodInvoker)(() => { labelItemCount.Text = "Item count: " + listViewItems.Items.Count.ToString(); }));
 		}
 
 		private void buttonLeaveFeedback_Click(object sender, EventArgs e)
@@ -121,13 +123,13 @@ namespace ebayLeaveFeedbackForSellers
 			buttonStop.Enabled = !enabled;
 		}
 
-		private void GeneralStatusUpdate(string status = null, int percentComplete = -1)
+		private void GeneralStatusUpdate(string status, int? percentComplete)
 		{
 			if (status != null)
 				Invoke((MethodInvoker)(() => { ((ToolStripStatusLabel)(statusStrip.Items["toolStripStatusLabel"])).Text = status; }));
 
-			if (percentComplete >= 0)
-				Invoke((MethodInvoker)(() => { ((ToolStripProgressBar)(statusStrip.Items["toolStripProgressBar"])).Value = percentComplete; }));
+			if (percentComplete.HasValue)
+				Invoke((MethodInvoker)(() => { ((ToolStripProgressBar)(statusStrip.Items["toolStripProgressBar"])).Value = percentComplete.Value; }));
 		}
 
 		private void FeedbackUpdate(string itemId, FeedbackUpdates updates)
@@ -152,6 +154,18 @@ namespace ebayLeaveFeedbackForSellers
 			}
 
 			ResetGui();
+		}
+
+		private void buttonSanitizeList_Click(object sender, EventArgs e)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			foreach (ListViewItem listViewItem in listViewItems.Items)
+			{
+				sb.Append((i++ == 0 ? string.Empty : " ") + listViewItem.SubItems[1].Text);
+			}
+
+			textBoxRawData.Text = sb.ToString();
 		}
 	}
 }

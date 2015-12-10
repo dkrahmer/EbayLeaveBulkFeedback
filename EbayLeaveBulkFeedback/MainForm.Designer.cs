@@ -43,6 +43,8 @@
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.buttonLeaveFeedback = new System.Windows.Forms.Button();
 			this.buttonStop = new System.Windows.Forms.Button();
+			this.labelItemCount = new System.Windows.Forms.Label();
+			this.buttonSanitizeList = new System.Windows.Forms.Button();
 			this.panelMain.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.SuspendLayout();
@@ -91,7 +93,7 @@
 			// Status
 			// 
 			this.Status.Text = "Status";
-			this.Status.Width = 50;
+			this.Status.Width = 90;
 			// 
 			// ItemId
 			// 
@@ -110,12 +112,13 @@
 			// 
 			// FeedbackLeft
 			// 
-			this.FeedbackLeft.Text = "FeedbackLeft";
+			this.FeedbackLeft.Text = "Feedback Left";
 			this.FeedbackLeft.Width = 500;
 			// 
 			// Result
 			// 
 			this.Result.Text = "API Result";
+			this.Result.Width = 150;
 			// 
 			// textBoxRawData
 			// 
@@ -173,11 +176,33 @@
 			this.buttonStop.UseVisualStyleBackColor = true;
 			this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
 			// 
+			// labelItemCount
+			// 
+			this.labelItemCount.AutoSize = true;
+			this.labelItemCount.Location = new System.Drawing.Point(13, 626);
+			this.labelItemCount.Name = "labelItemCount";
+			this.labelItemCount.Size = new System.Drawing.Size(89, 17);
+			this.labelItemCount.TabIndex = 15;
+			this.labelItemCount.Text = "Item count: 0";
+			// 
+			// buttonSanitizeList
+			// 
+			this.buttonSanitizeList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonSanitizeList.Location = new System.Drawing.Point(738, 626);
+			this.buttonSanitizeList.Name = "buttonSanitizeList";
+			this.buttonSanitizeList.Size = new System.Drawing.Size(140, 45);
+			this.buttonSanitizeList.TabIndex = 16;
+			this.buttonSanitizeList.Text = "Sanitize List";
+			this.buttonSanitizeList.UseVisualStyleBackColor = true;
+			this.buttonSanitizeList.Click += new System.EventHandler(this.buttonSanitizeList_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1182, 705);
+			this.Controls.Add(this.buttonSanitizeList);
+			this.Controls.Add(this.labelItemCount);
 			this.Controls.Add(this.buttonStop);
 			this.Controls.Add(this.buttonLeaveFeedback);
 			this.Controls.Add(this.statusStrip);
@@ -210,5 +235,7 @@
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
 		private System.Windows.Forms.Button buttonStop;
 		private System.Windows.Forms.ColumnHeader Result;
+		private System.Windows.Forms.Label labelItemCount;
+		private System.Windows.Forms.Button buttonSanitizeList;
 	}
 }

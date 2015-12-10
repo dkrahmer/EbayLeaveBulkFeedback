@@ -17,41 +17,48 @@ namespace ebayLeaveFeedbackForSellers
 {
 	class EbayLeaveFeedback
 	{
-		private ApiContext _apiContext = null;
-
 		public EbayLeaveFeedback()
 		{
 			// Last page of waiting for feedback: http://www.ebay.com/myb/PurchaseHistory#PurchaseHistoryOrdersContainer?ipp=100&Period=1&Filter=9&radioChk=1&GotoPage=100&_trksid=p2057872.m2749.l4670&cmid=2749&melid=page&_trksid=p2057872.m2749.l4670
-			// Get AppID and ServerAddress from Web.config
-			string appID = ConfigurationManager.AppSettings["EbayAppId"];
-			string ebayFindingServiceUrl = ConfigurationManager.AppSettings["EbayFindingServiceUrl"];
-
-			ClientConfig config = new ClientConfig();
-			// Initialize service end-point configration
-			config.EndPointAddress = ebayFindingServiceUrl;
-
-			// set eBay developer account AppID
-			config.ApplicationId = appID;
-
-			// Create a service client
-			_apiContext = GetApiContext();
 		}
 
-		public int LeaveFeedbacks(HashSet<string> itemIds, Action<string, int> generalStatusUpdate = null, Action<string, FeedbackUpdates> feedbackUpdate = null)
+		public int LeaveFeedbacks(HashSet<string> itemIds, Action<string, int?> generalStatusUpdate = null, Action<string, FeedbackUpdates> feedbackUpdate = null)
 		{
-			const string baseMessageGettingListOfItems = "Getting list of item transactions that need feedback...";
+			// Get EbayUserTokens from Web.config
+			var ebayUserTokens = new List<string>();
+			int totalFeedbacks = 0;
+			for (int i = 1; ; i++)
+			{
+				var ebayUserToken = ConfigurationManager.AppSettings["EbayUserToken" + (i < 2 ? string.Empty : i.ToString())];
+				if (string.IsNullOrEmpty(ebayUserToken))
+					break;
+
+				// Create a service client
+				var apiContext = GetApiContext(ebayUserToken);
+				totalFeedbacks += LeaveFeedbacks(apiContext, itemIds, generalStatusUpdate, feedbackUpdate, profileName: i.ToString());
+				if (totalFeedbacks >= itemIds.Count)
+					break;	// We already found all the items. No need to continue.
+			}
+
+			return totalFeedbacks;
+		}
+
+		public int LeaveFeedbacks(ApiContext apiContext, HashSet<string> itemIds, Action<string, int?> generalStatusUpdate = null, Action<string, FeedbackUpdates> feedbackUpdate = null, string profileName = null)
+		{
+			string baseMessage = (profileName == null ? string.Empty : "Profile " + profileName + ": ");
+			string baseMessageGettingListOfItems = "Getting list of item transactions that need feedback...";
 			if (generalStatusUpdate != null)
-				generalStatusUpdate(baseMessageGettingListOfItems, 0);
+				generalStatusUpdate(baseMessage + baseMessageGettingListOfItems, 0);
 
 			var feedbackToSellers = ConfigurationManager.AppSettings["FeedbackToSellers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 			var feedbackToBuyers = ConfigurationManager.AppSettings["FeedbackToBuyers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 
-			var getItemsAwaitingFeedback = new GetItemsAwaitingFeedbackCall(_apiContext);
+			var getItemsAwaitingFeedback = new GetItemsAwaitingFeedbackCall(apiContext);
 
 			PaginationType paginationType = new PaginationType();
 			paginationType.EntriesPerPage = 100;
 			getItemsAwaitingFeedback.Pagination = paginationType;
-			PaginatedTransactionArrayType awaitingFeedbackItems;
+			PaginatedTransactionArrayType awaitingFeedbackItems = null;
 
 			PaginationType paginationTypeTrans = new PaginationType()
 			{
@@ -65,11 +72,18 @@ namespace ebayLeaveFeedbackForSellers
 			var uniqueItemIdsFound = new HashSet<string>();
 			do
 			{
+				if (generalStatusUpdate != null)
+				{
+					generalStatusUpdate(baseMessage + baseMessageGettingListOfItems + " Page "
+						+ paginationType.PageNumber.ToString()
+						+ (awaitingFeedbackItems == null ? string.Empty
+							: (" of " + awaitingFeedbackItems.PaginationResult.TotalNumberOfPages.ToString())), null);
+				}
 				awaitingFeedbackItems = getItemsAwaitingFeedback.GetItemsAwaitingFeedback(ItemSortTypeCodeType.EndTime, paginationType);
 				if (generalStatusUpdate != null)
 				{
 					int percentComplete = (((((paginationType.PageNumber - 1) * paginationType.EntriesPerPage) + awaitingFeedbackItems.TransactionArray.Count) * 100) / awaitingFeedbackItems.PaginationResult.TotalNumberOfEntries) / 2;
-					generalStatusUpdate(baseMessageGettingListOfItems + " Page " + paginationType.PageNumber.ToString() + " of " + awaitingFeedbackItems.PaginationResult.TotalNumberOfPages.ToString(), percentComplete);
+					generalStatusUpdate(null, percentComplete);
 				}
 
 				// process returned transaction data for the current page     
@@ -123,7 +137,7 @@ namespace ebayLeaveFeedbackForSellers
 				if (generalStatusUpdate != null)
 				{
 					int percentComplete = 50 + (((feedbackItemNumber * 100) / allAwaitingFeedbackItems.Count) / 2);
-					generalStatusUpdate("Giving feedback to [" + giveFeedbackTo + "] for item: " + feedbackItem.Item.Title + " (" + feedbackItem.Item.ItemID + ")", percentComplete);
+					generalStatusUpdate(baseMessage + "Giving feedback to [" + giveFeedbackTo + "] for item: " + feedbackItem.Item.Title + " (" + feedbackItem.Item.ItemID + ")", percentComplete);
 				}
 				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection();
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication });
@@ -131,7 +145,7 @@ namespace ebayLeaveFeedbackForSellers
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges });
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime });
 
-				var leaveFeedbackCall = new LeaveFeedbackCall(_apiContext);
+				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext);
 
 				string feedback = null;
 
@@ -176,54 +190,35 @@ namespace ebayLeaveFeedbackForSellers
 
 				feedbackItemNumber++;
 			}
-			
+
 			return feedbackCount;
-		}
-
-		public bool LeaveFeedback(string itemId, string commentText, string transactionID, string targetUser)
-		{
-			var request = new LeaveFeedbackCall(_apiContext);
-			request.ItemID = itemId;
-			request.TargetUser = targetUser;
-
-			request.LeaveFeedback(itemId, commentText, CommentTypeCodeType.Positive, transactionID, targetUser);
-			return true;
 		}
 
 		/// <summary>
 		/// Populate eBay SDK ApiContext object with data from application configuration file
 		/// </summary>
 		/// <returns>ApiContext object</returns>
-		ApiContext GetApiContext()
+		ApiContext GetApiContext(string ebayUserToken)
 		{
-			//apiContext is a singleton,
-			//to avoid duplicate configuration reading
-			if (_apiContext != null)
+			//set Api Token to access eBay Api Server
+			ApiCredential apiCredential = new ApiCredential()
 			{
-				return _apiContext;
-			}
-			else
-			{
-				_apiContext = new ApiContext();
+				eBayToken = ebayUserToken
+			};
 
-				//set Api Server Url
-				_apiContext.SoapApiServerUrl = ConfigurationManager.AppSettings["EbayApiServerUrl"];
-				//set Api Token to access eBay Api Server
-				ApiCredential apiCredential = new ApiCredential();
-				apiCredential.eBayToken = ConfigurationManager.AppSettings["EbayUserToken"];
-				_apiContext.ApiCredential = apiCredential;
+			//set Api logging
+			ApiLogManager apiLogManager = new ApiLogManager() { EnableLogging = true };
+			apiLogManager.ApiLoggerList.Add(new FileLogger("ebayApiLog.txt", true, true, true));
+
+			var apiContext = new ApiContext()
+			{
+				ApiCredential = apiCredential,
 				//set eBay Site target to US
-				_apiContext.Site = SiteCodeType.US;
+				Site = SiteCodeType.US,
+				ApiLogManager = apiLogManager
+			};
 
-				//set Api logging
-				_apiContext.ApiLogManager = new ApiLogManager();
-				_apiContext.ApiLogManager.ApiLoggerList.Add(
-					new FileLogger("ebayApiLog.txt", true, true, true)
-					);
-				_apiContext.ApiLogManager.EnableLogging = true;
-
-				return _apiContext;
-			}
+			return apiContext;
 		}
 	}
 }

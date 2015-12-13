@@ -1,4 +1,5 @@
-﻿namespace ebayLeaveFeedbackForSellers
+﻿using EbayLeaveBulkFeedback;
+namespace EbayLeaveBulkFeedback
 {
 	partial class MainForm
 	{
@@ -30,7 +31,7 @@
 		{
 			this.panelMain = new System.Windows.Forms.Panel();
 			this.splitterRawParsed = new System.Windows.Forms.Splitter();
-			this.listViewItems = new System.Windows.Forms.ListView();
+			this.listViewItems = new ListViewNonFlicker();
 			this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -45,6 +46,8 @@
 			this.buttonStop = new System.Windows.Forms.Button();
 			this.labelItemCount = new System.Windows.Forms.Label();
 			this.buttonSanitizeList = new System.Windows.Forms.Button();
+			this.buttonClearCompleted = new System.Windows.Forms.Button();
+			this.buttonItemPicker = new System.Windows.Forms.Button();
 			this.panelMain.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.SuspendLayout();
@@ -59,7 +62,7 @@
 			this.panelMain.Controls.Add(this.textBoxRawData);
 			this.panelMain.Location = new System.Drawing.Point(12, 12);
 			this.panelMain.Name = "panelMain";
-			this.panelMain.Size = new System.Drawing.Size(1158, 597);
+			this.panelMain.Size = new System.Drawing.Size(1488, 597);
 			this.panelMain.TabIndex = 4;
 			// 
 			// splitterRawParsed
@@ -67,7 +70,7 @@
 			this.splitterRawParsed.Dock = System.Windows.Forms.DockStyle.Top;
 			this.splitterRawParsed.Location = new System.Drawing.Point(0, 183);
 			this.splitterRawParsed.Name = "splitterRawParsed";
-			this.splitterRawParsed.Size = new System.Drawing.Size(1158, 3);
+			this.splitterRawParsed.Size = new System.Drawing.Size(1488, 3);
 			this.splitterRawParsed.TabIndex = 10;
 			this.splitterRawParsed.TabStop = false;
 			// 
@@ -85,7 +88,7 @@
 			this.listViewItems.GridLines = true;
 			this.listViewItems.Location = new System.Drawing.Point(0, 183);
 			this.listViewItems.Name = "listViewItems";
-			this.listViewItems.Size = new System.Drawing.Size(1158, 414);
+			this.listViewItems.Size = new System.Drawing.Size(1488, 414);
 			this.listViewItems.TabIndex = 9;
 			this.listViewItems.UseCompatibleStateImageBehavior = false;
 			this.listViewItems.View = System.Windows.Forms.View.Details;
@@ -125,7 +128,7 @@
 			this.textBoxRawData.Dock = System.Windows.Forms.DockStyle.Top;
 			this.textBoxRawData.Location = new System.Drawing.Point(0, 0);
 			this.textBoxRawData.Name = "textBoxRawData";
-			this.textBoxRawData.Size = new System.Drawing.Size(1158, 183);
+			this.textBoxRawData.Size = new System.Drawing.Size(1488, 183);
 			this.textBoxRawData.TabIndex = 7;
 			this.textBoxRawData.Text = "Place raw list of item IDs here...";
 			this.textBoxRawData.TextChanged += new System.EventHandler(this.textBoxRawData_TextChanged);
@@ -137,7 +140,7 @@
             this.toolStripStatusLabel});
 			this.statusStrip.Location = new System.Drawing.Point(0, 680);
 			this.statusStrip.Name = "statusStrip";
-			this.statusStrip.Size = new System.Drawing.Size(1182, 25);
+			this.statusStrip.Size = new System.Drawing.Size(1512, 25);
 			this.statusStrip.TabIndex = 12;
 			this.statusStrip.Text = "statusStrip";
 			// 
@@ -156,7 +159,7 @@
 			// buttonLeaveFeedback
 			// 
 			this.buttonLeaveFeedback.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonLeaveFeedback.Location = new System.Drawing.Point(1030, 626);
+			this.buttonLeaveFeedback.Location = new System.Drawing.Point(1360, 626);
 			this.buttonLeaveFeedback.Name = "buttonLeaveFeedback";
 			this.buttonLeaveFeedback.Size = new System.Drawing.Size(140, 45);
 			this.buttonLeaveFeedback.TabIndex = 13;
@@ -168,7 +171,7 @@
 			// 
 			this.buttonStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonStop.Enabled = false;
-			this.buttonStop.Location = new System.Drawing.Point(884, 626);
+			this.buttonStop.Location = new System.Drawing.Point(1214, 626);
 			this.buttonStop.Name = "buttonStop";
 			this.buttonStop.Size = new System.Drawing.Size(140, 45);
 			this.buttonStop.TabIndex = 14;
@@ -178,8 +181,9 @@
 			// 
 			// labelItemCount
 			// 
+			this.labelItemCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.labelItemCount.AutoSize = true;
-			this.labelItemCount.Location = new System.Drawing.Point(13, 626);
+			this.labelItemCount.Location = new System.Drawing.Point(12, 612);
 			this.labelItemCount.Name = "labelItemCount";
 			this.labelItemCount.Size = new System.Drawing.Size(89, 17);
 			this.labelItemCount.TabIndex = 15;
@@ -188,7 +192,7 @@
 			// buttonSanitizeList
 			// 
 			this.buttonSanitizeList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonSanitizeList.Location = new System.Drawing.Point(738, 626);
+			this.buttonSanitizeList.Location = new System.Drawing.Point(922, 626);
 			this.buttonSanitizeList.Name = "buttonSanitizeList";
 			this.buttonSanitizeList.Size = new System.Drawing.Size(140, 45);
 			this.buttonSanitizeList.TabIndex = 16;
@@ -196,11 +200,35 @@
 			this.buttonSanitizeList.UseVisualStyleBackColor = true;
 			this.buttonSanitizeList.Click += new System.EventHandler(this.buttonSanitizeList_Click);
 			// 
+			// buttonClearCompleted
+			// 
+			this.buttonClearCompleted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonClearCompleted.Location = new System.Drawing.Point(1068, 626);
+			this.buttonClearCompleted.Name = "buttonClearCompleted";
+			this.buttonClearCompleted.Size = new System.Drawing.Size(140, 45);
+			this.buttonClearCompleted.TabIndex = 17;
+			this.buttonClearCompleted.Text = "Clear Completed";
+			this.buttonClearCompleted.UseVisualStyleBackColor = true;
+			this.buttonClearCompleted.Click += new System.EventHandler(this.buttonClearCompleted_Click);
+			// 
+			// buttonItemPicker
+			// 
+			this.buttonItemPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonItemPicker.Location = new System.Drawing.Point(12, 632);
+			this.buttonItemPicker.Name = "buttonItemPicker";
+			this.buttonItemPicker.Size = new System.Drawing.Size(140, 45);
+			this.buttonItemPicker.TabIndex = 18;
+			this.buttonItemPicker.Text = "Item Picker...";
+			this.buttonItemPicker.UseVisualStyleBackColor = true;
+			this.buttonItemPicker.Click += new System.EventHandler(this.buttonItemPicker_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1182, 705);
+			this.ClientSize = new System.Drawing.Size(1512, 705);
+			this.Controls.Add(this.buttonItemPicker);
+			this.Controls.Add(this.buttonClearCompleted);
 			this.Controls.Add(this.buttonSanitizeList);
 			this.Controls.Add(this.labelItemCount);
 			this.Controls.Add(this.buttonStop);
@@ -237,5 +265,7 @@
 		private System.Windows.Forms.ColumnHeader Result;
 		private System.Windows.Forms.Label labelItemCount;
 		private System.Windows.Forms.Button buttonSanitizeList;
+		private System.Windows.Forms.Button buttonClearCompleted;
+		private System.Windows.Forms.Button buttonItemPicker;
 	}
 }

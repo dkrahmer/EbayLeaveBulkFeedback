@@ -10,13 +10,34 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ebayLeaveFeedbackForSellers
+namespace EbayLeaveBulkFeedback
 {
 	public partial class MainForm : Form
 	{
 		Dictionary<string, ListViewItem> _items;
 		Thread _listViewUpdaterThread;
 		Thread _leaveFeedbackThread;
+
+		private ItemListDialog _itemListDialog;
+		public ItemListDialog GetItemListDialog
+		{
+			get
+			{
+				if (_itemListDialog == null)
+				{
+					_itemListDialog = new ItemListDialog();
+					_itemListDialog.DoubleClickAction = AddItemId;
+					_itemListDialog.SelectedItems = new HashSet<string>(_items.Keys);
+				}
+
+				return _itemListDialog;
+			}
+		}
+
+		private void AddItemId(string itemInfo)
+		{
+			textBoxRawData.Text += "\r\n" + itemInfo;
+		}
 
 		public MainForm()
 		{
@@ -73,6 +94,7 @@ namespace ebayLeaveFeedbackForSellers
 			}
 
 			Invoke((MethodInvoker)(() => { labelItemCount.Text = "Item count: " + listViewItems.Items.Count.ToString(); }));
+			Invoke((MethodInvoker)(() => { _listViewUpdaterThread = null; }));
 		}
 
 		private void buttonLeaveFeedback_Click(object sender, EventArgs e)
@@ -108,6 +130,7 @@ namespace ebayLeaveFeedbackForSellers
 			}
 
 			Invoke((MethodInvoker)(() => { ResetGui(); }));
+			Invoke((MethodInvoker)(() => { _leaveFeedbackThread = null; }));
 		}
 
 		private void ResetGui()
@@ -158,6 +181,11 @@ namespace ebayLeaveFeedbackForSellers
 
 		private void buttonSanitizeList_Click(object sender, EventArgs e)
 		{
+			SanitizeList();
+		}
+
+		private void SanitizeList()
+		{
 			StringBuilder sb = new StringBuilder();
 			int i = 0;
 			foreach (ListViewItem listViewItem in listViewItems.Items)
@@ -166,6 +194,27 @@ namespace ebayLeaveFeedbackForSellers
 			}
 
 			textBoxRawData.Text = sb.ToString();
+		}
+
+		private void buttonClearCompleted_Click(object sender, EventArgs e)
+		{
+			foreach (ListViewItem listViewItem in listViewItems.Items)
+			{
+				if (listViewItem.SubItems[0].Text == "Done")
+					Invoke((MethodInvoker)(() => { listViewItems.Items.Remove(listViewItem); }));
+			}
+
+			SanitizeList();
+		}
+
+		private void buttonItemPicker_Click(object sender, EventArgs e)
+		{
+			ShowItemPicker();
+		}
+
+		private void ShowItemPicker()
+		{
+			GetItemListDialog.Show();
 		}
 	}
 }

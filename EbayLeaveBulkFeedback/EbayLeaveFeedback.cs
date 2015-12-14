@@ -106,6 +106,7 @@ namespace EbayLeaveBulkFeedback
 						{
 							Seller = awaitingFeedbackItem.Item.Seller.UserID,
 							Title = awaitingFeedbackItem.Item.Title,
+							TransactionId = awaitingFeedbackItem.TransactionID,
 							Status = "Pending"
 						};
 

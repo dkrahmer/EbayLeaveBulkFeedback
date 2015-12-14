@@ -21,11 +21,14 @@ namespace EbayLeaveBulkFeedback
 {
 	public class AvailableFeedbackItemProcessor
 	{
-		public AvailableFeedbackItemProcessor()
+		SQLiteDatabase _db;
+
+		public AvailableFeedbackItemProcessor(SQLiteDatabase db)
 		{
+			_db = db;
 		}
 
-		public int ProcessAvailableFeedbackItems(Action<string, EbayItemSummary> each_ProfileName_Item)
+		public int GetAvailableFeedbackItems(Action<string, string, string, string> each_ItemId_TransactionId_OrderLineItemId_ProfileName)
 		{
 			// Get EbayUserTokens from Web.config
 			var ebayUserTokens = new List<string>();
@@ -38,41 +41,15 @@ namespace EbayLeaveBulkFeedback
 
 				// Create a service client
 				var apiContext = GetApiContext(ebayUserToken);
-				totalItems += ProcessAvailableFeedbackItems(apiContext, each_ProfileName_Item, profileName: i.ToString());
+				totalItems += GetAvailableFeedbackItems(apiContext, each_ItemId_TransactionId_OrderLineItemId_ProfileName, profileName: i.ToString());
 			}
 
 			return totalItems;
 		}
 
-		//public int LeaveFeedbacks(ApiContext apiContext, HashSet<string> itemIds, Action<string, int?> generalStatusUpdate = null, Action<string, FeedbackUpdates> feedbackUpdate = null, string profileName = null)
-		public int ProcessAvailableFeedbackItems(ApiContext apiContext, Action<string, EbayItemSummary> each_ProfileName_Item, string profileName)
+
+		public int GetAvailableFeedbackItems(ApiContext apiContext, Action<string, string, string, string> each_ItemId_TransactionId_OrderLineItemId_ProfileName, string profileName)
 		{
-			/*
-			string tmpId = Guid.NewGuid().ToString();
-			var itemSummary3 = new EbayItemSummary()
-			{
-				ItemId = tmpId,
-				TransactionId = "0",
-				GalleryImageUrl = "http://test/",
-				GalleryImage = new Bitmap(@"D:\dl\howto_listview_icons\1_64x64.png"),//new byte[] {1,2,3,4,5,6,7,8,9,0},
-				Title = "My Title 123",
-				EndDateTime = DateTime.Now
-			};
-
-			SetCachedItemSummary(itemSummary3);
-			var summ = GetCachedItemSummary(tmpId, "0");
-			return 2;
-
-			var awaitingFeedbackItem2 = new TransactionType();
-			awaitingFeedbackItem2.Item = new ItemType() { ItemID = "191747590750" };
-			awaitingFeedbackItem2.TransactionID = "0";
-			var itemSummary2 = GetItemSummary(awaitingFeedbackItem2, apiContext);
-			
-			return 1;
-			 * 
-			 * */
-
-
 			string baseMessage = (profileName == null ? string.Empty : "Profile " + profileName + ": ");
 			//string baseMessageGettingListOfItems = "Getting list of item transactions that need feedback...";
 			//if (generalStatusUpdate != null)
@@ -125,12 +102,10 @@ namespace EbayLeaveBulkFeedback
 
 						uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);	// A Hashset will only keep a single instance of unique values
 
-						var itemSummary = GetItemSummary(awaitingFeedbackItem, apiContext);
+						//var itemSummary = GetItemSummary(awaitingFeedbackItem, apiContext);
 						//allAwaitingFeedbackItems.Add(awaitingFeedbackItem);
-						if (itemSummary == null)
-							return;
 
-						each_ProfileName_Item(profileName, itemSummary);
+						each_ItemId_TransactionId_OrderLineItemId_ProfileName(awaitingFeedbackItem.Item.ItemID, awaitingFeedbackItem.OrderLineItemID, awaitingFeedbackItem.TransactionID, profileName);
 						//var thread = new Thread(new ParameterizedThreadStart(parallel_each_ProfileName_Item));
 						//thread.Start(new object[] { each_ProfileName_Item, profileName, itemDetails, awaitingFeedbackItem });
 
@@ -157,180 +132,6 @@ namespace EbayLeaveBulkFeedback
 			return itemCount;
 		}
 
-		private EbayItemSummary GetItemSummary(TransactionType transactionDetails, ApiContext apiContext)
-		{
-			EbayItemSummary itemSummary = null;
-
-			itemSummary = GetCachedItemSummary(transactionDetails.Item.ItemID, transactionDetails.TransactionID);
-			if (itemSummary != null)
-				return itemSummary;
-
-			try
-			{
-				var getItemCall = new eBay.Service.Call.GetItemCall(apiContext) { TransactionID = transactionDetails.TransactionID };
-				var itemDetails = getItemCall.GetItem(transactionDetails.Item.ItemID);
-
-				Bitmap image = null;
-				try
-				{
-					if (!string.IsNullOrEmpty(itemDetails.PictureDetails.GalleryURL))
-					{
-						var request = WebRequest.Create(itemDetails.PictureDetails.GalleryURL);
-						using (var response = request.GetResponse())
-						using (var stream = response.GetResponseStream())
-						{
-							image = (Bitmap)Bitmap.FromStream(stream);
-						}
-					}
-
-					itemSummary = new EbayItemSummary()
-					{
-						ItemId = itemDetails.ItemID,
-						TransactionId = transactionDetails.TransactionID,
-						Seller = transactionDetails.Item.Seller.UserID,
-						GalleryImageUrl = itemDetails.PictureDetails.GalleryURL,
-						GalleryImage = image,
-						Title = itemDetails.Title,
-						EndDateTime = itemDetails.ListingDetails.EndTime
-					};
-
-					SetCachedItemSummary(itemSummary);
-				}
-				catch (Exception ex)
-				{
-				}
-			}
-			catch (Exception ex)
-			{ 
-			}
-
-			return itemSummary;
-		}
-
-		private object _dbLock = new object();
-		private SQLiteDatabase _db;
-		public SQLiteDatabase DB
-		{
-			get
-			{
-				lock (_dbLock)
-				{
-					if (_db == null)
-					{
-						_db = new SQLiteDatabase(ConfigurationManager.AppSettings["SqliteDataFile"]);
-						VerifyDb();
-					}
-
-					return _db;
-				}
-			}
-		}
-
-		private void VerifyDb()
-		{
-			string sql = "SELECT NAME FROM SQLITE_MASTER WHERE type='table' AND name='EbayItemsAwaitingFeedback';";
-			if (_db.GetDataRow(sql) == null)
-			{
-				// Init the new database
-				string createSql = @"CREATE TABLE [EbayItemsAwaitingFeedback] (
-						[ItemId] TEXT NOT NULL PRIMARY KEY,
-						[TransactionId] TEXT NULL,
-						[Title] TEXT NOT NULL,
-						[Seller] TEXT NULL,
-						[GalleryImageUrl] TEXT NULL,
-						[GalleryImage] BLOB NULL,
-						[EndDateTime] TIMESTAMP NOT NULL,
-						[CreateDateTime] TIMESTAMP NOT NULL,
-						[Status] TEXT NULL,
-						[FeedbackLeft] TEXT NULL
-					);
-
-					CREATE UNIQUE INDEX [IDX_EbayItemsAwaitingFeedback_ItemId] ON [EbayItemsAwaitingFeedback](
-						[ItemId] ASC
-					);
-					";
-
-				_db.ExecuteNonQuery(createSql);
-			}
-		}
-
-
-		private EbayItemSummary GetCachedItemSummary(string itemId, string transactionId = null)
-		{
-			string sql = "SELECT ItemId, Title, Seller, GalleryImage, EndDateTime FROM EbayItemsAwaitingFeedback WHERE ItemId = '" 
-				+ itemId.Replace("'", "") + "'"
-				+ (transactionId == null ? string.Empty : " AND TransactionId = '" + transactionId.Replace("'", "")) + "'";
-			var dataColumns = new DataColumn[]
-			{
-				new DataColumn("ItemId", typeof(string)),
-				new DataColumn("Title", typeof(string)),
-				new DataColumn("Seller", typeof(string)),
-				new DataColumn("GalleryImage", typeof(byte[])),
-				new DataColumn("EndDateTime", typeof(DateTime))
-			};
-			DataRow dataRow;
-			lock (_dbLock)
-			{
-				dataRow = DB.GetDataRow(sql, dataColumns);
-			}
-			if (dataRow == null)
-				return null;
-
-			Bitmap galleryImage = null;
-			var galleryImageBytes = dataRow.ItemArray[3] as byte[];
-			if (galleryImageBytes != null && galleryImageBytes.Length > 0)
-			{
-				try
-				{
-					using (MemoryStream stream = new MemoryStream(galleryImageBytes))
-					{
-						galleryImage = (Bitmap)Bitmap.FromStream(stream);
-					}
-				}
-				catch (Exception ex)
-				{
-				}
-			}
-
-			EbayItemSummary itemSummary = new EbayItemSummary()
-			{
-				ItemId				= dataRow.ItemArray[0] as string,
-				Title				= dataRow.ItemArray[1] as string,
-				Seller				= dataRow.ItemArray[2] as string,
-				GalleryImage		= galleryImage,
-				EndDateTime			= (DateTime) dataRow.ItemArray[4],
-			};
-
-			return itemSummary;
-		}
-
-		private int SetCachedItemSummary(EbayItemSummary itemSummary)
-		{
-			var data = new Dictionary<string, object>();
-			data["ItemId"] = itemSummary.ItemId;
-			data["TransactionId"] = itemSummary.TransactionId;
-			data["Title"] = itemSummary.Title;
-			data["Seller"] = itemSummary.Seller;
-			data["GalleryImageUrl"] = itemSummary.GalleryImageUrl;
-			data["GalleryImage"] = (itemSummary.GalleryImage == null ? null : (byte[])new ImageConverter().ConvertTo(itemSummary.GalleryImage, typeof(byte[])));
-			data["EndDateTime"] = itemSummary.EndDateTime;
-			data["CreateDateTime"] = DateTime.Now;
-
-			lock (_dbLock)
-			{
-				return DB.Insert("EbayItemsAwaitingFeedback", data);
-			}
-		}
-
-		private void parallel_each_ProfileName_Item(object obj)
-		{
-			var objects = (object[])obj;
-			var each_ProfileName_Item = (Action<string, ItemType>)objects[0];
-			var profileName = (string)objects[1];
-			var itemDetails = (ItemType)objects[2];
-
-			each_ProfileName_Item(profileName, itemDetails);
-		}
 
 		/// <summary>
 		/// Populate eBay SDK ApiContext object with data from application configuration file

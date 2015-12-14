@@ -16,7 +16,8 @@ namespace EbayLeaveBulkFeedback
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			var dataManager = new DataManager();
+			Application.Run(new MainForm(dataManager));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace EbayLeaveBulkFeedback
 {
-	partial class ItemListDialog
+	partial class ItemPickDialog
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.listViewItems = new EbayLeaveBulkFeedback.ListViewNonFlicker();
+			this.pickListView = new EbayLeaveBulkFeedback.ListViewNonFlicker();
 			this.Title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.EndDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -38,28 +38,30 @@
 			this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
 			this.toolStripItemCount = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.textBoxSearch = new System.Windows.Forms.TextBox();
+			this.buttonSearch = new System.Windows.Forms.Button();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// listViewItems
+			// pickListView
 			// 
-			this.listViewItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.pickListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.listViewItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.pickListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Title,
             this.EndDate,
             this.ItemId,
             this.Seller,
             this.UserProfile});
-			this.listViewItems.Location = new System.Drawing.Point(0, 0);
-			this.listViewItems.Name = "listViewItems";
-			this.listViewItems.Size = new System.Drawing.Size(1017, 619);
-			this.listViewItems.TabIndex = 0;
-			this.listViewItems.TileSize = new System.Drawing.Size(300, 150);
-			this.listViewItems.UseCompatibleStateImageBehavior = false;
-			this.listViewItems.View = System.Windows.Forms.View.Tile;
-			this.listViewItems.DoubleClick += new System.EventHandler(this.listViewItems_DoubleClick);
+			this.pickListView.Location = new System.Drawing.Point(0, 38);
+			this.pickListView.Name = "pickListView";
+			this.pickListView.Size = new System.Drawing.Size(1017, 581);
+			this.pickListView.TabIndex = 0;
+			this.pickListView.TileSize = new System.Drawing.Size(315, 150);
+			this.pickListView.UseCompatibleStateImageBehavior = false;
+			this.pickListView.View = System.Windows.Forms.View.Tile;
+			this.pickListView.DoubleClick += new System.EventHandler(this.listViewItems_DoubleClick);
 			// 
 			// Title
 			// 
@@ -114,16 +116,37 @@
 			this.toolStripStatusLabel.Text = "...";
 			this.toolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// ItemListDialog
+			// textBoxSearch
+			// 
+			this.textBoxSearch.Location = new System.Drawing.Point(12, 10);
+			this.textBoxSearch.Name = "textBoxSearch";
+			this.textBoxSearch.Size = new System.Drawing.Size(278, 22);
+			this.textBoxSearch.TabIndex = 2;
+			this.textBoxSearch.TextChanged += new System.EventHandler(this.textBoxSearch_TextChanged);
+			// 
+			// buttonSearch
+			// 
+			this.buttonSearch.Location = new System.Drawing.Point(297, 10);
+			this.buttonSearch.Name = "buttonSearch";
+			this.buttonSearch.Size = new System.Drawing.Size(75, 22);
+			this.buttonSearch.TabIndex = 3;
+			this.buttonSearch.Text = "Search";
+			this.buttonSearch.UseVisualStyleBackColor = true;
+			this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
+			// 
+			// ItemPickDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1017, 647);
+			this.Controls.Add(this.buttonSearch);
+			this.Controls.Add(this.textBoxSearch);
 			this.Controls.Add(this.statusStrip1);
-			this.Controls.Add(this.listViewItems);
-			this.Name = "ItemListDialog";
+			this.Controls.Add(this.pickListView);
+			this.Name = "ItemPickDialog";
 			this.Text = "Items Ready For Feedback";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ItemListDialog_FormClosing);
+			this.Load += new System.EventHandler(this.ItemPickDialog_Load);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
@@ -136,12 +159,14 @@
 		private System.Windows.Forms.ColumnHeader Title;
 		private System.Windows.Forms.ColumnHeader EndDate;
 		private System.Windows.Forms.ColumnHeader ItemId;
-		private ListViewNonFlicker listViewItems;
+		private ListViewNonFlicker pickListView;
 		private System.Windows.Forms.ColumnHeader UserProfile;
 		private System.Windows.Forms.ColumnHeader Seller;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripItemCount;
+		private System.Windows.Forms.TextBox textBoxSearch;
+		private System.Windows.Forms.Button buttonSearch;
 	}
 }

@@ -31,23 +31,26 @@ namespace EbayLeaveBulkFeedback
 		{
 			this.panelMain = new System.Windows.Forms.Panel();
 			this.splitterRawParsed = new System.Windows.Forms.Splitter();
-			this.listViewItems = new ListViewNonFlicker();
-			this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.Title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.SellerName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.FeedbackLeft = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.Result = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.textBoxRawData = new System.Windows.Forms.RichTextBox();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.buttonLeaveFeedback = new System.Windows.Forms.Button();
 			this.buttonStop = new System.Windows.Forms.Button();
-			this.labelItemCount = new System.Windows.Forms.Label();
+			this.toolStripItemCount = new System.Windows.Forms.Label();
 			this.buttonSanitizeList = new System.Windows.Forms.Button();
 			this.buttonClearCompleted = new System.Windows.Forms.Button();
 			this.buttonItemPicker = new System.Windows.Forms.Button();
+			this.feedbackListView = new EbayLeaveBulkFeedback.ListViewNonFlicker();
+			this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.Title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.SellerName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.FeedbackLeft = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.Result = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.TransactionId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.OrderLineItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ProfileName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.panelMain.SuspendLayout();
 			this.statusStrip.SuspendLayout();
 			this.SuspendLayout();
@@ -58,7 +61,7 @@ namespace EbayLeaveBulkFeedback
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelMain.Controls.Add(this.splitterRawParsed);
-			this.panelMain.Controls.Add(this.listViewItems);
+			this.panelMain.Controls.Add(this.feedbackListView);
 			this.panelMain.Controls.Add(this.textBoxRawData);
 			this.panelMain.Location = new System.Drawing.Point(12, 12);
 			this.panelMain.Name = "panelMain";
@@ -73,55 +76,6 @@ namespace EbayLeaveBulkFeedback
 			this.splitterRawParsed.Size = new System.Drawing.Size(1488, 3);
 			this.splitterRawParsed.TabIndex = 10;
 			this.splitterRawParsed.TabStop = false;
-			// 
-			// listViewItems
-			// 
-			this.listViewItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.Status,
-            this.ItemId,
-            this.Title,
-            this.SellerName,
-            this.FeedbackLeft,
-            this.Result});
-			this.listViewItems.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.listViewItems.FullRowSelect = true;
-			this.listViewItems.GridLines = true;
-			this.listViewItems.Location = new System.Drawing.Point(0, 183);
-			this.listViewItems.Name = "listViewItems";
-			this.listViewItems.Size = new System.Drawing.Size(1488, 414);
-			this.listViewItems.TabIndex = 9;
-			this.listViewItems.UseCompatibleStateImageBehavior = false;
-			this.listViewItems.View = System.Windows.Forms.View.Details;
-			// 
-			// Status
-			// 
-			this.Status.Text = "Status";
-			this.Status.Width = 90;
-			// 
-			// ItemId
-			// 
-			this.ItemId.Text = "Item ID";
-			this.ItemId.Width = 105;
-			// 
-			// Title
-			// 
-			this.Title.Text = "Title";
-			this.Title.Width = 505;
-			// 
-			// SellerName
-			// 
-			this.SellerName.Text = "Seller Name";
-			this.SellerName.Width = 133;
-			// 
-			// FeedbackLeft
-			// 
-			this.FeedbackLeft.Text = "Feedback Left";
-			this.FeedbackLeft.Width = 500;
-			// 
-			// Result
-			// 
-			this.Result.Text = "API Result";
-			this.Result.Width = 150;
 			// 
 			// textBoxRawData
 			// 
@@ -179,15 +133,15 @@ namespace EbayLeaveBulkFeedback
 			this.buttonStop.UseVisualStyleBackColor = true;
 			this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
 			// 
-			// labelItemCount
+			// toolStripItemCount
 			// 
-			this.labelItemCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelItemCount.AutoSize = true;
-			this.labelItemCount.Location = new System.Drawing.Point(12, 612);
-			this.labelItemCount.Name = "labelItemCount";
-			this.labelItemCount.Size = new System.Drawing.Size(89, 17);
-			this.labelItemCount.TabIndex = 15;
-			this.labelItemCount.Text = "Item count: 0";
+			this.toolStripItemCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.toolStripItemCount.AutoSize = true;
+			this.toolStripItemCount.Location = new System.Drawing.Point(12, 612);
+			this.toolStripItemCount.Name = "toolStripItemCount";
+			this.toolStripItemCount.Size = new System.Drawing.Size(57, 17);
+			this.toolStripItemCount.TabIndex = 15;
+			this.toolStripItemCount.Text = "Items: 0";
 			// 
 			// buttonSanitizeList
 			// 
@@ -213,7 +167,7 @@ namespace EbayLeaveBulkFeedback
 			// 
 			// buttonItemPicker
 			// 
-			this.buttonItemPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonItemPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonItemPicker.Location = new System.Drawing.Point(12, 632);
 			this.buttonItemPicker.Name = "buttonItemPicker";
 			this.buttonItemPicker.Size = new System.Drawing.Size(140, 45);
@@ -221,6 +175,75 @@ namespace EbayLeaveBulkFeedback
 			this.buttonItemPicker.Text = "Item Picker...";
 			this.buttonItemPicker.UseVisualStyleBackColor = true;
 			this.buttonItemPicker.Click += new System.EventHandler(this.buttonItemPicker_Click);
+			// 
+			// feedbackListView
+			// 
+			this.feedbackListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.Status,
+            this.ItemId,
+            this.Title,
+            this.SellerName,
+            this.FeedbackLeft,
+            this.Result,
+            this.TransactionId,
+            this.OrderLineItemId,
+            this.ProfileName});
+			this.feedbackListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.feedbackListView.FullRowSelect = true;
+			this.feedbackListView.GridLines = true;
+			this.feedbackListView.Location = new System.Drawing.Point(0, 183);
+			this.feedbackListView.Name = "feedbackListView";
+			this.feedbackListView.Size = new System.Drawing.Size(1488, 414);
+			this.feedbackListView.TabIndex = 9;
+			this.feedbackListView.UseCompatibleStateImageBehavior = false;
+			this.feedbackListView.View = System.Windows.Forms.View.Details;
+			// 
+			// Status
+			// 
+			this.Status.Text = "Status";
+			this.Status.Width = 90;
+			// 
+			// ItemId
+			// 
+			this.ItemId.Text = "Item ID";
+			this.ItemId.Width = 105;
+			// 
+			// Title
+			// 
+			this.Title.Text = "Title";
+			this.Title.Width = 505;
+			// 
+			// SellerName
+			// 
+			this.SellerName.Text = "Seller Name";
+			this.SellerName.Width = 133;
+			// 
+			// FeedbackLeft
+			// 
+			this.FeedbackLeft.Text = "Feedback Left";
+			this.FeedbackLeft.Width = 500;
+			// 
+			// Result
+			// 
+			this.Result.Text = "API Result";
+			this.Result.Width = 150;
+			// 
+			// TransactionId
+			// 
+			this.TransactionId.DisplayIndex = 7;
+			this.TransactionId.Text = "Transaction ID";
+			this.TransactionId.Width = 105;
+			// 
+			// OrderLineItemId
+			// 
+			this.OrderLineItemId.DisplayIndex = 8;
+			this.OrderLineItemId.Text = "Order Line Item ID";
+			this.OrderLineItemId.Width = 125;
+			// 
+			// ProfileName
+			// 
+			this.ProfileName.DisplayIndex = 6;
+			this.ProfileName.Text = "Profile";
 			// 
 			// MainForm
 			// 
@@ -230,7 +253,7 @@ namespace EbayLeaveBulkFeedback
 			this.Controls.Add(this.buttonItemPicker);
 			this.Controls.Add(this.buttonClearCompleted);
 			this.Controls.Add(this.buttonSanitizeList);
-			this.Controls.Add(this.labelItemCount);
+			this.Controls.Add(this.toolStripItemCount);
 			this.Controls.Add(this.buttonStop);
 			this.Controls.Add(this.buttonLeaveFeedback);
 			this.Controls.Add(this.statusStrip);
@@ -250,7 +273,6 @@ namespace EbayLeaveBulkFeedback
 
 		private System.Windows.Forms.Panel panelMain;
 		private System.Windows.Forms.Splitter splitterRawParsed;
-		private System.Windows.Forms.ListView listViewItems;
 		private System.Windows.Forms.RichTextBox textBoxRawData;
 		private System.Windows.Forms.StatusStrip statusStrip;
 		private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
@@ -263,9 +285,13 @@ namespace EbayLeaveBulkFeedback
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
 		private System.Windows.Forms.Button buttonStop;
 		private System.Windows.Forms.ColumnHeader Result;
-		private System.Windows.Forms.Label labelItemCount;
+		private System.Windows.Forms.Label toolStripItemCount;
 		private System.Windows.Forms.Button buttonSanitizeList;
 		private System.Windows.Forms.Button buttonClearCompleted;
 		private System.Windows.Forms.Button buttonItemPicker;
+		private ListViewNonFlicker feedbackListView;
+		private System.Windows.Forms.ColumnHeader TransactionId;
+		private System.Windows.Forms.ColumnHeader ProfileName;
+		private System.Windows.Forms.ColumnHeader OrderLineItemId;
 	}
 }

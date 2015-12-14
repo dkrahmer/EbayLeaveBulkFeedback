@@ -41,6 +41,14 @@ namespace EbayLeaveBulkFeedback
 			_dbConnection = str;
 		}
 
+		public SqliteConnection GetOpenConnection()
+		{
+			var cnn = new SqliteConnection(_dbConnection);
+			cnn.Open();
+
+			return cnn;
+		}
+
 		/// <summary>
 		///     Allows the programmer to run a query against the Database.
 		/// </summary>
@@ -51,42 +59,43 @@ namespace EbayLeaveBulkFeedback
 			DataTable dt = new DataTable();
 			try
 			{
-				SqliteConnection cnn = new SqliteConnection(_dbConnection);
-				cnn.Open();
-				SqliteCommand mycommand = new SqliteCommand(sql, cnn);
-				SqliteDataReader reader = mycommand.ExecuteReader();
-
-				if (dataColumns == null)
+				using (SqliteConnection cnn = new SqliteConnection(_dbConnection))
 				{
-					var schema = reader.GetSchemaTable();
-					foreach (DataRow schCol in schema.Rows)
+					cnn.Open();
+					SqliteCommand mycommand = new SqliteCommand(sql, cnn);
+					using (SqliteDataReader reader = mycommand.ExecuteReader())
 					{
-						DataColumn dataColumn = new DataColumn(
-							(string)schCol["ColumnName"],
-							(Type)schCol["DataType"]);
-						dt.Columns.Add(dataColumn);
+						if (dataColumns == null)
+						{
+							var schema = reader.GetSchemaTable();
+							foreach (DataRow schCol in schema.Rows)
+							{
+								DataColumn dataColumn = new DataColumn(
+									(string)schCol["ColumnName"],
+									(Type)schCol["DataType"]);
+								dt.Columns.Add(dataColumn);
+							}
+						}
+						else
+						{
+							foreach (DataColumn dataColumn in dataColumns)
+							{
+								dt.Columns.Add(dataColumn);
+							}
+						}
+
+						while (reader.NextResult())
+						{
+							DataRow row = dt.NewRow();
+							for (int i = 0; i < dt.Columns.Count; i++)
+							{
+								row[i] = reader.GetValue(i);
+							}
+							dt.Rows.Add(row);
+						}
+
 					}
 				}
-				else
-				{
-					foreach (DataColumn dataColumn in dataColumns)
-					{
-						dt.Columns.Add(dataColumn);
-					}
-				}
-
-				while (reader.NextResult())
-				{
-					DataRow row = dt.NewRow();
-					for (int i = 0; i < dt.Columns.Count; i++)
-					{
-						row[i] = reader.GetValue(i);
-					}
-					dt.Rows.Add(row);
-				}
-
-				reader.Close();
-				cnn.Close();
 			}
 			catch (Exception ex)
 			{

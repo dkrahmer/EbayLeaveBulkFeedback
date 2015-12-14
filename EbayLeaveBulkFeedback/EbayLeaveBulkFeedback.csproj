@@ -64,12 +64,13 @@
     <Compile Include="EbayLeaveFeedback.cs" />
     <Compile Include="FeedbackUpdates.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="ItemListDialog.cs">
+    <Compile Include="ItemPickDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ItemListDialog.Designer.cs">
-      <DependentUpon>ItemListDialog.cs</DependentUpon>
+    <Compile Include="ItemPickDialog.Designer.cs">
+      <DependentUpon>ItemPickDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataManager.cs" />
     <Compile Include="ListViewItemComparer.cs" />
     <Compile Include="ListViewNonFlicker.cs">
       <SubType>Component</SubType>
@@ -83,8 +84,8 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="ItemListDialog.resx">
-      <DependentUpon>ItemListDialog.cs</DependentUpon>
+    <EmbeddedResource Include="ItemPickDialog.resx">
+      <DependentUpon>ItemPickDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -109,7 +110,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

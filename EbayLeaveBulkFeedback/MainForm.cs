@@ -148,6 +148,7 @@ namespace EbayLeaveBulkFeedback
 		private void ShowItemPicker()
 		{
 			ItemPickDialog.Show();
+			ItemPickDialog.BringToFront();
 		}
 
 		private void UpdateItemCount()

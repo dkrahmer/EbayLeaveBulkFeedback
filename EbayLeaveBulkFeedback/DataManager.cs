@@ -111,7 +111,7 @@ namespace EbayLeaveBulkFeedback
 					_initPickListViewThread.Abort();
 				}
 
-				_initPickListViewThread = new Thread(new ParameterizedThreadStart(InitPickListView));
+				_initPickListViewThread = new Thread(new ParameterizedThreadStart(InitPickListView)) { IsBackground = true };
 				_initPickListViewThread.Start(true);
 				return;
 			}
@@ -400,7 +400,7 @@ namespace EbayLeaveBulkFeedback
 				_updateListViewAsyncThread.Abort();
 			}
 
-			_updateListViewAsyncThread = new Thread(new ThreadStart(UpdateListView));
+			_updateListViewAsyncThread = new Thread(new ThreadStart(UpdateListView)) { IsBackground = true };
 			_updateListViewAsyncThread.Start();
 		}
 
@@ -510,7 +510,7 @@ namespace EbayLeaveBulkFeedback
 					_listViewUpdaterThread.Abort();
 				}
 
-				_listViewUpdaterThread = new Thread(new ParameterizedThreadStart(UpdateFeedbackListViewAsync));
+				_listViewUpdaterThread = new Thread(new ParameterizedThreadStart(UpdateFeedbackListViewAsync)) { IsBackground = true };
 				_listViewUpdaterThread.Start(true);
 				return;
 			}
@@ -626,7 +626,7 @@ namespace EbayLeaveBulkFeedback
 			{
 				_leaveFeedbackThread.Abort();
 			}
-			_leaveFeedbackThread = new Thread(new ParameterizedThreadStart(LeaveFeedbacks));
+			_leaveFeedbackThread = new Thread(new ParameterizedThreadStart(LeaveFeedbacks)) { IsBackground = true };
 			_leaveFeedbackThread.Start(new object[] { before, after, generalStatusUpdate });
 
 			return _leaveFeedbackThread;

@@ -25,7 +25,7 @@ namespace EbayLeaveBulkFeedback
 				{
 					_itemPickDialog = new ItemPickDialog(_dataManager)
 					{
-						DoubleClickAction = AddRawItem
+						PickItemsAction = AddRawItem
 					};
 				}
 
@@ -133,7 +133,8 @@ namespace EbayLeaveBulkFeedback
 		{
 			foreach (ListViewItem listViewItem in feedbackListView.Items)
 			{
-				if (listViewItem.SubItems[0].Text == "Done")
+				string status = listViewItem.SubItems[0].Text;
+				if (status == "Done" || status == "Ignore")
 					Invoke((MethodInvoker)(() => { feedbackListView.Items.Remove(listViewItem); }));
 			}
 
@@ -147,6 +148,7 @@ namespace EbayLeaveBulkFeedback
 
 		private void ShowItemPicker()
 		{
+			ItemPickDialog.WindowState = FormWindowState.Maximized;
 			ItemPickDialog.Show();
 			ItemPickDialog.BringToFront();
 		}
@@ -154,6 +156,19 @@ namespace EbayLeaveBulkFeedback
 		private void UpdateItemCount()
 		{
 			toolStripItemCount.Text = "Items: " + feedbackListView.Items.Count.ToString();
+		}
+
+		private void buttonIgnoreSelected_Click(object sender, EventArgs e)
+		{
+			var updates = new FeedbackUpdates()
+			{
+				Status = "Ignore"
+			};
+
+			foreach (ListViewItem item in feedbackListView.Items)
+			{
+				_dataManager.FeedbackUpdate(item.SubItems[1].Text, updates);
+			}
 		}
 	}
 }

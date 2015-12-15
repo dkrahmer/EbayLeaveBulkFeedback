@@ -39,7 +39,7 @@
 			this.toolStripItemCount = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.textBoxSearch = new System.Windows.Forms.TextBox();
-			this.buttonSearch = new System.Windows.Forms.Button();
+			this.label1 = new System.Windows.Forms.Label();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -62,6 +62,7 @@
 			this.pickListView.UseCompatibleStateImageBehavior = false;
 			this.pickListView.View = System.Windows.Forms.View.Tile;
 			this.pickListView.DoubleClick += new System.EventHandler(this.listViewItems_DoubleClick);
+			this.pickListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pickListView_MouseUp);
 			// 
 			// Title
 			// 
@@ -120,26 +121,25 @@
 			// 
 			this.textBoxSearch.Location = new System.Drawing.Point(12, 10);
 			this.textBoxSearch.Name = "textBoxSearch";
-			this.textBoxSearch.Size = new System.Drawing.Size(278, 22);
+			this.textBoxSearch.Size = new System.Drawing.Size(348, 22);
 			this.textBoxSearch.TabIndex = 2;
 			this.textBoxSearch.TextChanged += new System.EventHandler(this.textBoxSearch_TextChanged);
 			// 
-			// buttonSearch
+			// label1
 			// 
-			this.buttonSearch.Location = new System.Drawing.Point(297, 10);
-			this.buttonSearch.Name = "buttonSearch";
-			this.buttonSearch.Size = new System.Drawing.Size(75, 22);
-			this.buttonSearch.TabIndex = 3;
-			this.buttonSearch.Text = "Search";
-			this.buttonSearch.UseVisualStyleBackColor = true;
-			this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(366, 13);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(445, 17);
+			this.label1.TabIndex = 3;
+			this.label1.Text = "Double-click or right-click highlighted items to pick items for feedback.";
 			// 
 			// ItemPickDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1017, 647);
-			this.Controls.Add(this.buttonSearch);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textBoxSearch);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.pickListView);
@@ -147,6 +147,7 @@
 			this.Text = "Items Ready For Feedback";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ItemListDialog_FormClosing);
 			this.Load += new System.EventHandler(this.ItemPickDialog_Load);
+			this.Shown += new System.EventHandler(this.ItemPickDialog_Shown);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);
@@ -167,6 +168,6 @@
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripItemCount;
 		private System.Windows.Forms.TextBox textBoxSearch;
-		private System.Windows.Forms.Button buttonSearch;
+		private System.Windows.Forms.Label label1;
 	}
 }

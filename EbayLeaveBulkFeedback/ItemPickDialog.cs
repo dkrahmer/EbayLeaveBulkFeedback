@@ -15,7 +15,7 @@ namespace EbayLeaveBulkFeedback
 {
 	public partial class ItemPickDialog : Form
 	{
-		public Action<string> DoubleClickAction { get; set; }
+		public Action<string> PickItemsAction { get; set; }
 		private DataManager _dataManager;
 
 		public ItemPickDialog(DataManager dataManager)
@@ -52,7 +52,13 @@ namespace EbayLeaveBulkFeedback
 
 		private void listViewItems_DoubleClick(object sender, EventArgs e)
 		{
-			_dataManager.ProcessSelectedPickListItems(DoubleClickAction);
+			_dataManager.ProcessSelectedPickListItems(PickItemsAction);
+		}
+
+		private void pickListView_MouseUp(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+				_dataManager.ProcessSelectedPickListItems(PickItemsAction);
 		}
 		
 		private void listViewItems_Scroll(object sender, ScrollEventArgs e)
@@ -88,6 +94,11 @@ namespace EbayLeaveBulkFeedback
 		private void textBoxSearch_TextChanged(object sender, EventArgs e)
 		{
 			_dataManager.SearchString = textBoxSearch.Text;
+		}
+
+		private void ItemPickDialog_Shown(object sender, EventArgs e)
+		{
+			textBoxSearch.Focus();
 		}
 	}
 }

@@ -31,12 +31,14 @@ namespace EbayLeaveBulkFeedback
 		public ListView PickListView { get; set; }
 		public RichTextBox TextBoxRawFeedbackData;
 		private string _searchString;
+		private string[] _searchStrings;
 		public string SearchString
 		{
 			get { return _searchString; }
 			set 
 			{ 
 				_searchString = value;
+				_searchStrings = _searchString.Split(' ');
 				UpdateListViewAsync();
 			}
 		}
@@ -361,15 +363,17 @@ namespace EbayLeaveBulkFeedback
 
 		public void ProcessSelectedPickListItems(Action<string> processListItem)
 		{
-			if (processListItem != null && PickListView.SelectedItems.Count != 0)
+			if (processListItem != null && PickListView.SelectedItems.Count > 0)
 			{
-				var listItem = PickListView.SelectedItems[0];
-				string title = listItem.SubItems[PICK_SUBITEM_TITLE].Text;
-				string date = listItem.SubItems[PICK_SUBITEM_DATE].Text;
-				string itemId = listItem.SubItems[PICK_SUBITEM_ITEM_ID].Text;
-				processListItem(itemId + " - " + date + " - " + title);
+				foreach (ListViewItem listItem in PickListView.SelectedItems)
+				{
+					string title = listItem.SubItems[PICK_SUBITEM_TITLE].Text;
+					string date = listItem.SubItems[PICK_SUBITEM_DATE].Text;
+					string itemId = listItem.SubItems[PICK_SUBITEM_ITEM_ID].Text;
+					processListItem(itemId + " - " + date + " - " + title);
 
-				listItem.BackColor = Color.Yellow;
+					listItem.BackColor = Color.Yellow;
+				}
 			}
 		}
 
@@ -384,12 +388,28 @@ namespace EbayLeaveBulkFeedback
 
 		private bool IsFilterMatch(ListViewItem listViewItem)
 		{
-			if (string.IsNullOrEmpty(SearchString))
+			if (_searchStrings == null)
 				return true;
 
-			return listViewItem.SubItems[0].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0		// Title
-				|| listViewItem.SubItems[2].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0		// ItemId
-				|| listViewItem.SubItems[3].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Seller
+			foreach (string searchString in _searchStrings)
+			{
+				bool found =
+					listViewItem.SubItems[0].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// Title
+					|| listViewItem.SubItems[2].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// ItemId
+					|| listViewItem.SubItems[3].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Seller
+				
+				if (!found)
+					return false;
+			}
+
+			return true;
+
+			//if (string.IsNullOrEmpty(SearchString))
+			//	return true;
+
+			//return listViewItem.SubItems[0].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0		// Title
+			//	|| listViewItem.SubItems[2].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0		// ItemId
+			//	|| listViewItem.SubItems[3].Text.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Seller
 		}
 
 		private Thread _updateListViewAsyncThread;
@@ -472,7 +492,7 @@ namespace EbayLeaveBulkFeedback
 			breakHere++;
 		}
 
-		internal void FeedbackUpdate(string itemId, FeedbackUpdates updates)
+		public void FeedbackUpdate(string itemId, FeedbackUpdates updates)
 		{
 			ListViewItem listViewItem;
 			if (_feedbackList.TryGetValue(itemId, out listViewItem))
@@ -641,8 +661,6 @@ namespace EbayLeaveBulkFeedback
 
 			MainForm.Invoke((MethodInvoker)(() => { before(); }));
 			
-			var ebayLeaveFeedback = new EbayLeaveFeedback();
-			//var items = new HashSet<string>(_feedbackList.Keys);
 			try
 			{
 				var feedbackToSellers = ConfigurationManager.AppSettings["FeedbackToSellers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
@@ -650,7 +668,7 @@ namespace EbayLeaveBulkFeedback
 				foreach (var feedbackItem in _feedbackList)
 				{
 					string status = feedbackItem.Value.SubItems[0].Text;
-					if (!string.IsNullOrEmpty(status))
+					if (!(string.IsNullOrEmpty(status) || status == "Error"))
 						continue;
 
 					string profileName = feedbackItem.Value.SubItems[8].Text;
@@ -665,8 +683,6 @@ namespace EbayLeaveBulkFeedback
 					string feedback = feedbackToSellers[random.Next(0, feedbackToSellers.Length - 1)];
 					LeaveFeedback(feedbackItem.Key, transactionId, orderLineItemId, sellerName, apiContext, feedback);
 				}
-				//ebayLeaveFeedback.LeaveFeedbacks
-				//int feedbacksLeft = ebayLeaveFeedback.LeaveFeedbacks(items, generalStatusUpdate, FeedbackUpdate);
 			}
 			catch (Exception ex)
 			{
@@ -684,14 +700,26 @@ namespace EbayLeaveBulkFeedback
 		{
 			try
 			{
-				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext);
-
 				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection();
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication });
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed });
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges });
 				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime });
 
+				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext)
+				{
+					//ItemID = itemId,
+					//CommentText = feedback,
+					//CommentType = CommentTypeCodeType.Positive,
+					//TransactionID = transactionId,
+					//TargetUser = giveFeedbackTo,
+					SellerItemRatingDetailArrayList = itemRatingDetailsTypeCollection,
+					//OrderLineItemID = orderLineItemId,
+					ItemArrivedWithinEDDType = ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange
+				};
+
+				string result = leaveFeedbackCall.LeaveFeedback(giveFeedbackTo, itemId, CommentTypeCodeType.Positive, feedback);
+				/*
 				string result = leaveFeedbackCall.LeaveFeedback(
 					itemId,
 					feedback,
@@ -701,6 +729,7 @@ namespace EbayLeaveBulkFeedback
 					itemRatingDetailsTypeCollection,
 					orderLineItemId,
 					ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange);	// eBay.Service.Core.Soap
+				*/
 
 				var updates = new FeedbackUpdates()
 				{
@@ -712,18 +741,21 @@ namespace EbayLeaveBulkFeedback
 			}
 			catch (Exception ex)
 			{
-				if (ex.Message.Contains(" "))	
+				string status;
+				if (ex.Message.Contains("feedback has been left already"))	
 				{
-					var updates = new FeedbackUpdates()
-					{
-						FeedbackLeft = feedback,
-						Status = "Error",
-						Result = "Error"
-					};
-					FeedbackUpdate(itemId, updates);
+					status = "Done";
 				}
-				int i = 0;
-				i++;
+				else
+				{
+					status = "Error";
+				}
+				var updates = new FeedbackUpdates()
+				{
+					Status = status,
+					Result = ex.Message
+				};
+				FeedbackUpdate(itemId, updates);
 			}
 		}
 

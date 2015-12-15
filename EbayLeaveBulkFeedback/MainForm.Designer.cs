@@ -41,6 +41,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonSanitizeList = new System.Windows.Forms.Button();
 			this.buttonClearCompleted = new System.Windows.Forms.Button();
 			this.buttonItemPicker = new System.Windows.Forms.Button();
+			this.buttonIgnoreSelected = new System.Windows.Forms.Button();
 			this.feedbackListView = new EbayLeaveBulkFeedback.ListViewNonFlicker();
 			this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -65,7 +66,7 @@ namespace EbayLeaveBulkFeedback
 			this.panelMain.Controls.Add(this.textBoxRawData);
 			this.panelMain.Location = new System.Drawing.Point(12, 12);
 			this.panelMain.Name = "panelMain";
-			this.panelMain.Size = new System.Drawing.Size(1488, 597);
+			this.panelMain.Size = new System.Drawing.Size(1488, 612);
 			this.panelMain.TabIndex = 4;
 			// 
 			// splitterRawParsed
@@ -92,7 +93,7 @@ namespace EbayLeaveBulkFeedback
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar,
             this.toolStripStatusLabel});
-			this.statusStrip.Location = new System.Drawing.Point(0, 680);
+			this.statusStrip.Location = new System.Drawing.Point(0, 684);
 			this.statusStrip.Name = "statusStrip";
 			this.statusStrip.Size = new System.Drawing.Size(1512, 25);
 			this.statusStrip.TabIndex = 12;
@@ -113,7 +114,7 @@ namespace EbayLeaveBulkFeedback
 			// buttonLeaveFeedback
 			// 
 			this.buttonLeaveFeedback.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonLeaveFeedback.Location = new System.Drawing.Point(1360, 626);
+			this.buttonLeaveFeedback.Location = new System.Drawing.Point(1360, 630);
 			this.buttonLeaveFeedback.Name = "buttonLeaveFeedback";
 			this.buttonLeaveFeedback.Size = new System.Drawing.Size(140, 45);
 			this.buttonLeaveFeedback.TabIndex = 13;
@@ -125,7 +126,7 @@ namespace EbayLeaveBulkFeedback
 			// 
 			this.buttonStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonStop.Enabled = false;
-			this.buttonStop.Location = new System.Drawing.Point(1214, 626);
+			this.buttonStop.Location = new System.Drawing.Point(1214, 630);
 			this.buttonStop.Name = "buttonStop";
 			this.buttonStop.Size = new System.Drawing.Size(140, 45);
 			this.buttonStop.TabIndex = 14;
@@ -137,7 +138,7 @@ namespace EbayLeaveBulkFeedback
 			// 
 			this.toolStripItemCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.toolStripItemCount.AutoSize = true;
-			this.toolStripItemCount.Location = new System.Drawing.Point(12, 612);
+			this.toolStripItemCount.Location = new System.Drawing.Point(12, 630);
 			this.toolStripItemCount.Name = "toolStripItemCount";
 			this.toolStripItemCount.Size = new System.Drawing.Size(57, 17);
 			this.toolStripItemCount.TabIndex = 15;
@@ -146,7 +147,7 @@ namespace EbayLeaveBulkFeedback
 			// buttonSanitizeList
 			// 
 			this.buttonSanitizeList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonSanitizeList.Location = new System.Drawing.Point(922, 626);
+			this.buttonSanitizeList.Location = new System.Drawing.Point(922, 630);
 			this.buttonSanitizeList.Name = "buttonSanitizeList";
 			this.buttonSanitizeList.Size = new System.Drawing.Size(140, 45);
 			this.buttonSanitizeList.TabIndex = 16;
@@ -157,7 +158,7 @@ namespace EbayLeaveBulkFeedback
 			// buttonClearCompleted
 			// 
 			this.buttonClearCompleted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonClearCompleted.Location = new System.Drawing.Point(1068, 626);
+			this.buttonClearCompleted.Location = new System.Drawing.Point(1068, 630);
 			this.buttonClearCompleted.Name = "buttonClearCompleted";
 			this.buttonClearCompleted.Size = new System.Drawing.Size(140, 45);
 			this.buttonClearCompleted.TabIndex = 17;
@@ -168,13 +169,24 @@ namespace EbayLeaveBulkFeedback
 			// buttonItemPicker
 			// 
 			this.buttonItemPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonItemPicker.Location = new System.Drawing.Point(12, 632);
+			this.buttonItemPicker.Location = new System.Drawing.Point(122, 630);
 			this.buttonItemPicker.Name = "buttonItemPicker";
 			this.buttonItemPicker.Size = new System.Drawing.Size(140, 45);
 			this.buttonItemPicker.TabIndex = 18;
 			this.buttonItemPicker.Text = "Item Picker...";
 			this.buttonItemPicker.UseVisualStyleBackColor = true;
 			this.buttonItemPicker.Click += new System.EventHandler(this.buttonItemPicker_Click);
+			// 
+			// buttonIgnoreSelected
+			// 
+			this.buttonIgnoreSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonIgnoreSelected.Location = new System.Drawing.Point(742, 630);
+			this.buttonIgnoreSelected.Name = "buttonIgnoreSelected";
+			this.buttonIgnoreSelected.Size = new System.Drawing.Size(140, 45);
+			this.buttonIgnoreSelected.TabIndex = 19;
+			this.buttonIgnoreSelected.Text = "Ignore Selected";
+			this.buttonIgnoreSelected.UseVisualStyleBackColor = true;
+			this.buttonIgnoreSelected.Click += new System.EventHandler(this.buttonIgnoreSelected_Click);
 			// 
 			// feedbackListView
 			// 
@@ -193,7 +205,7 @@ namespace EbayLeaveBulkFeedback
 			this.feedbackListView.GridLines = true;
 			this.feedbackListView.Location = new System.Drawing.Point(0, 183);
 			this.feedbackListView.Name = "feedbackListView";
-			this.feedbackListView.Size = new System.Drawing.Size(1488, 414);
+			this.feedbackListView.Size = new System.Drawing.Size(1488, 429);
 			this.feedbackListView.TabIndex = 9;
 			this.feedbackListView.UseCompatibleStateImageBehavior = false;
 			this.feedbackListView.View = System.Windows.Forms.View.Details;
@@ -249,7 +261,8 @@ namespace EbayLeaveBulkFeedback
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1512, 705);
+			this.ClientSize = new System.Drawing.Size(1512, 709);
+			this.Controls.Add(this.buttonIgnoreSelected);
 			this.Controls.Add(this.buttonItemPicker);
 			this.Controls.Add(this.buttonClearCompleted);
 			this.Controls.Add(this.buttonSanitizeList);
@@ -293,5 +306,6 @@ namespace EbayLeaveBulkFeedback
 		private System.Windows.Forms.ColumnHeader TransactionId;
 		private System.Windows.Forms.ColumnHeader ProfileName;
 		private System.Windows.Forms.ColumnHeader OrderLineItemId;
+		private System.Windows.Forms.Button buttonIgnoreSelected;
 	}
 }

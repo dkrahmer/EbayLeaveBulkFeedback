@@ -40,6 +40,7 @@
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.textBoxSearch = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.Price = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -53,6 +54,7 @@
             this.EndDate,
             this.ItemId,
             this.Seller,
+            this.Price,
             this.UserProfile});
 			this.pickListView.Location = new System.Drawing.Point(0, 38);
 			this.pickListView.Name = "pickListView";
@@ -134,6 +136,11 @@
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Double-click or right-click highlighted items to pick items for feedback.";
 			// 
+			// Price
+			// 
+			this.Price.DisplayIndex = 5;
+			this.Price.Text = "Price";
+			// 
 			// ItemPickDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -169,5 +176,6 @@
 		private System.Windows.Forms.ToolStripStatusLabel toolStripItemCount;
 		private System.Windows.Forms.TextBox textBoxSearch;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.ColumnHeader Price;
 	}
 }

@@ -92,7 +92,8 @@ namespace EbayLeaveBulkFeedback
 						[CreateDateTime] TIMESTAMP NOT NULL,
 						[Status] TEXT NULL,
 						[FeedbackLeft] TEXT NULL,
-						[ProfileName] TEXT NULL
+						[ProfileName] TEXT NULL,
+						[Price] NUMERIC NOT NULL
 					);
 
 					CREATE UNIQUE INDEX [IDX_EbayItemsAwaitingFeedback_ItemId] ON [EbayItemsAwaitingFeedback](
@@ -123,7 +124,7 @@ namespace EbayLeaveBulkFeedback
 				// load all records from database that have Status = '' to _listView
 				lock (DB)
 				{
-					string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName
+					string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName, Price
 									FROM EbayItemsAwaitingFeedback 
 									WHERE Status IS NULL OR Status = ''
 									ORDER BY EndDateTime";
@@ -260,7 +261,8 @@ namespace EbayLeaveBulkFeedback
 						Seller = itemDetails.Seller.UserID,
 						GalleryImageUrl = itemDetails.PictureDetails.GalleryURL,
 						ProfileName = profileName,
-						EndDateTime = itemDetails.ListingDetails.EndTime
+						EndDateTime = itemDetails.ListingDetails.EndTime,
+						Price = (decimal)itemDetails.SellingStatus.ConvertedCurrentPrice.Value
 					};
 
 					var data = new Dictionary<string, object>();
@@ -274,6 +276,7 @@ namespace EbayLeaveBulkFeedback
 					data["ProfileName"] = itemSummary.ProfileName;
 					data["EndDateTime"] = itemSummary.EndDateTime;
 					data["CreateDateTime"] = DateTime.Now;
+					data["Price"] = itemSummary.Price;
 
 					lock (DB)
 					{
@@ -332,6 +335,7 @@ namespace EbayLeaveBulkFeedback
 				listViewItem.SubItems.Add(itemSummary.EndDateTime.ToString("yyyy-MM-dd"));
 				listViewItem.SubItems.Add(itemSummary.ItemId);
 				listViewItem.SubItems.Add(itemSummary.Seller);
+				listViewItem.SubItems.Add(itemSummary.Price <= 0 ? string.Empty : itemSummary.Price.ToString("C"));
 				listViewItem.SubItems.Add(itemSummary.ProfileName);
 				ApplyPickViewItemStyle(listViewItem);
 
@@ -356,6 +360,7 @@ namespace EbayLeaveBulkFeedback
 				OrderLineItemId = (string)row[4],
 				EndDateTime = DateTime.Parse((string)row[5]),
 				ProfileName = (string)row[6],
+				Price = Convert.ToDecimal(row[7]),
 			};
 
 			return itemSummary;
@@ -614,7 +619,7 @@ namespace EbayLeaveBulkFeedback
 			string profileName		= null;
 
 			// Get from DB
-			string sql = @"	SELECT Status, Title, Seller, FeedbackLeft, TransactionId, OrderLineItemId, ProfileName
+			string sql = @"	SELECT Status, Title, Seller, FeedbackLeft, TransactionId, OrderLineItemId, ProfileName, Price
 							FROM EbayItemsAwaitingFeedback 
 							WHERE ItemId = '" + itemId.Replace("'", "''") + @"'";
 			DataRow row;
@@ -708,28 +713,11 @@ namespace EbayLeaveBulkFeedback
 
 				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext)
 				{
-					//ItemID = itemId,
-					//CommentText = feedback,
-					//CommentType = CommentTypeCodeType.Positive,
-					//TransactionID = transactionId,
-					//TargetUser = giveFeedbackTo,
 					SellerItemRatingDetailArrayList = itemRatingDetailsTypeCollection,
-					//OrderLineItemID = orderLineItemId,
 					ItemArrivedWithinEDDType = ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange
 				};
 
 				string result = leaveFeedbackCall.LeaveFeedback(giveFeedbackTo, itemId, CommentTypeCodeType.Positive, feedback);
-				/*
-				string result = leaveFeedbackCall.LeaveFeedback(
-					itemId,
-					feedback,
-					CommentTypeCodeType.Positive,
-					transactionId,
-					giveFeedbackTo,
-					itemRatingDetailsTypeCollection,
-					orderLineItemId,
-					ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange);	// eBay.Service.Core.Soap
-				*/
 
 				var updates = new FeedbackUpdates()
 				{

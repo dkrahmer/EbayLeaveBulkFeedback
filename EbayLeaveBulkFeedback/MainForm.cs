@@ -158,7 +158,7 @@ namespace EbayLeaveBulkFeedback
 			toolStripItemCount.Text = "Items: " + feedbackListView.Items.Count.ToString();
 		}
 
-		private void buttonIgnoreSelected_Click(object sender, EventArgs e)
+		private void buttonIgnoreListed_Click(object sender, EventArgs e)
 		{
 			var updates = new FeedbackUpdates()
 			{
@@ -167,6 +167,8 @@ namespace EbayLeaveBulkFeedback
 
 			foreach (ListViewItem item in feedbackListView.Items)
 			{
+				if (!string.IsNullOrEmpty(item.SubItems[0].Text))
+					continue;	// don't update if it already has a status
 				_dataManager.FeedbackUpdate(item.SubItems[1].Text, updates);
 			}
 		}

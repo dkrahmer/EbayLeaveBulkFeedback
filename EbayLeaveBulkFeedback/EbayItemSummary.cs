@@ -11,6 +11,7 @@ namespace EbayLeaveBulkFeedback
 		public string TransactionId { get; set; }
 		public string GalleryImageUrl { get; set; }
 		public string Title { get; set; }
+		public decimal Price { get; set; }
 		public DateTime EndDateTime { get; set; }
 		//public System.Drawing.Bitmap GalleryImage { get; set; }
 

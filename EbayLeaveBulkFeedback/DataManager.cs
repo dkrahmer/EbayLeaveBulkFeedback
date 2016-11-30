@@ -46,7 +46,7 @@ namespace EbayLeaveBulkFeedback
 		public Control PickDialog { get; set; }
 		public HashSet<string> SelectedItems { get; set; }
 		public Action FeedbackListViewChanged { get; set; }
-		public Action PickListViewChanged { get; set; }
+		public Func<bool, bool> PickListViewChanged { get; set; }
 		public Func<Bitmap, int> AddPickListViewImage { get; set; }
 
 		Thread _listViewUpdaterThread;
@@ -93,7 +93,8 @@ namespace EbayLeaveBulkFeedback
 						[Status] TEXT NULL,
 						[FeedbackLeft] TEXT NULL,
 						[ProfileName] TEXT NULL,
-						[Price] NUMERIC NOT NULL
+						[Price] NUMERIC NOT NULL,
+						[TrackingNumber] TEXT NULL
 					);
 
 					CREATE UNIQUE INDEX [IDX_EbayItemsAwaitingFeedback_ItemId] ON [EbayItemsAwaitingFeedback](
@@ -121,10 +122,17 @@ namespace EbayLeaveBulkFeedback
 
 			try
 			{
+				// Clear all first
+				_masterPickList.Clear();
+				PickDialog.Invoke((MethodInvoker)(() =>
+				{
+					PickListView.Items.Clear();
+					PickListViewChanged(false);
+				}));
 				// load all records from database that have Status = '' to _listView
 				lock (DB)
 				{
-					string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName, Price
+					string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, TrackingNumber, ProfileName, Price
 									FROM EbayItemsAwaitingFeedback 
 									WHERE Status IS NULL OR Status = ''
 									ORDER BY EndDateTime";
@@ -189,7 +197,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void MasterPickListAddItemAction(string itemId, string transactionId, string orderLineItemId, string profileName)
+		private void MasterPickListAddItemAction(string itemId, string orderLineItemId, string transactionId, string profileName)
 		{
 			ListViewItem listViewItem;
 			if (_masterPickList.TryGetValue(itemId, out listViewItem))
@@ -206,7 +214,7 @@ namespace EbayLeaveBulkFeedback
 
 		private EbayItemSummary GetItemSummary(string itemId, string transactionId, string orderLineItemId, string profileName)
 		{
-			string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName, Status
+			string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, TrackingNumber, ProfileName, Status
 							FROM EbayItemsAwaitingFeedback 
 							WHERE ItemId = '" + itemId.Replace("'", "''") + @"'";	// AND (Status IS NULL OR Status = '')";
 			DataRow row;
@@ -217,9 +225,12 @@ namespace EbayLeaveBulkFeedback
 
 			if (row != null)
 			{
-				if (!string.IsNullOrEmpty(row[7] as string))
+				if (!string.IsNullOrEmpty(row[8] as string))
 					return null;	// The status indicates we have already processed this item
-				return GetItemSummary(row);
+				
+				var itemSummary = GetItemSummary(row);
+
+				return itemSummary;
 			}
 			else
 			{
@@ -262,7 +273,8 @@ namespace EbayLeaveBulkFeedback
 						GalleryImageUrl = itemDetails.PictureDetails.GalleryURL,
 						ProfileName = profileName,
 						EndDateTime = itemDetails.ListingDetails.EndTime,
-						Price = (decimal)itemDetails.SellingStatus.ConvertedCurrentPrice.Value
+						Price = (decimal)itemDetails.SellingStatus.ConvertedCurrentPrice.Value,
+						TrackingNumber = GetTrackingNumber(itemId, apiContext: apiContext)
 					};
 
 					var data = new Dictionary<string, object>();
@@ -277,6 +289,7 @@ namespace EbayLeaveBulkFeedback
 					data["EndDateTime"] = itemSummary.EndDateTime;
 					data["CreateDateTime"] = DateTime.Now;
 					data["Price"] = itemSummary.Price;
+					data["TrackingNumber"] = itemSummary.TrackingNumber;
 
 					lock (DB)
 					{
@@ -296,6 +309,55 @@ namespace EbayLeaveBulkFeedback
 			return itemSummary;
 		}
 
+		private string GetTrackingNumber(string itemId, string profileName = null, ApiContext apiContext = null)
+		{
+			string trackingNumber = null;
+			try
+			{
+				if (apiContext == null)
+				{
+					var ebayUserToken = ConfigurationManager.AppSettings["EbayUserToken" + (profileName == "1" ? string.Empty : profileName)];
+					apiContext = GetApiContext(ebayUserToken);
+				}
+				var getTransactionsCall = new eBay.Service.Call.GetItemTransactionsCall(apiContext);
+
+				DateTime dateBase = DateTime.Now;
+				//for (int daysMultiplier = 0; daysMultiplier < 2; daysMultiplier++)
+				//{
+				var transactionDetails = getTransactionsCall.GetItemTransactions(itemId, new TimeFilter(dateBase.AddDays(-30), dateBase));
+				//if (transactionDetails.Count == 0)
+				//	return string.Empty;
+
+				foreach (TransactionType itemDetails in transactionDetails)
+				{
+					if (itemDetails.ShippingDetails != null && itemDetails.ShippingDetails.ShipmentTrackingDetails != null)
+					{
+						int shipmentNumber = 0;
+						foreach (ShipmentTrackingDetailsType shipment in itemDetails.ShippingDetails.ShipmentTrackingDetails)
+						{
+							trackingNumber = (trackingNumber ?? string.Empty)
+								+ (shipmentNumber == 0 ? string.Empty : ", ")
+								+ shipment.ShipmentTrackingNumber;
+							shipmentNumber++;
+						}
+						if (trackingNumber == null && itemDetails.ShippingDetails.ShippingTypeSpecified)
+							trackingNumber = string.Empty;
+
+						return trackingNumber;
+					}
+				}
+
+				//	dateBase = dateBase.AddDays(-30);
+				//}
+			}
+			catch (Exception ex)
+			{
+				LogException(ex);
+			}
+
+			return trackingNumber;
+		}
+
 		private ListViewItem MasterPickListAddItem(EbayItemSummary itemSummary)
 		{
 			ListViewItem listViewItem;
@@ -311,7 +373,7 @@ namespace EbayLeaveBulkFeedback
 					PickDialog.Invoke((MethodInvoker)(() =>
 					{
 						PickListView.Items.Add(listViewItem);
-						PickListViewChanged();
+						PickListViewChanged(false);
 					}));
 				}
 
@@ -336,6 +398,7 @@ namespace EbayLeaveBulkFeedback
 				listViewItem.SubItems.Add(itemSummary.ItemId);
 				listViewItem.SubItems.Add(itemSummary.Seller);
 				listViewItem.SubItems.Add(itemSummary.Price <= 0 ? string.Empty : itemSummary.Price.ToString("C"));
+				listViewItem.SubItems.Add(itemSummary.TrackingNumber);
 				listViewItem.SubItems.Add(itemSummary.ProfileName);
 				ApplyPickViewItemStyle(listViewItem);
 
@@ -359,9 +422,25 @@ namespace EbayLeaveBulkFeedback
 				TransactionId = (string)row[3],
 				OrderLineItemId = (string)row[4],
 				EndDateTime = DateTime.Parse((string)row[5]),
-				ProfileName = (string)row[6],
-				Price = Convert.ToDecimal(row[7]),
+				TrackingNumber = row[6] as string,
+				ProfileName = (string)row[7],
+				Price = Convert.ToDecimal(row[8])
 			};
+
+			// no tracking number? Try to get one now
+			if (itemSummary.TrackingNumber == null)
+			{
+				itemSummary.TrackingNumber = GetTrackingNumber(itemSummary.ItemId, profileName: itemSummary.ProfileName);
+				if (itemSummary.TrackingNumber != null)
+				{
+					var data = new Dictionary<string, object>();
+					data["TrackingNumber"] = itemSummary.TrackingNumber;
+					lock (DB)
+					{
+						DB.Update("EbayItemsAwaitingFeedback", data, "ItemId='" + itemSummary.ItemId.Replace("'", "''") + "'");
+					}
+				}
+			}
 
 			return itemSummary;
 		}
@@ -401,7 +480,8 @@ namespace EbayLeaveBulkFeedback
 				bool found =
 					listViewItem.SubItems[0].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// Title
 					|| listViewItem.SubItems[2].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// ItemId
-					|| listViewItem.SubItems[3].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Seller
+					|| listViewItem.SubItems[3].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0	// Seller
+					|| listViewItem.SubItems[5].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Tracking number
 				
 				if (!found)
 					return false;
@@ -422,6 +502,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			if (_updateListViewAsyncThread != null && _updateListViewAsyncThread.IsAlive)
 			{
+				_updateListViewAsyncThread.Interrupt();
 				_updateListViewAsyncThread.Abort();
 			}
 
@@ -465,7 +546,7 @@ namespace EbayLeaveBulkFeedback
 						PickDialog.Invoke((MethodInvoker)(() => 
 						{
 							PickListView.Items.RemoveAt(i);
-							PickListViewChanged();
+							PickListViewChanged(true);
 						}));
 					}
 				}
@@ -476,7 +557,7 @@ namespace EbayLeaveBulkFeedback
 					PickDialog.Invoke((MethodInvoker)(() => 
 					{
 						PickListView.Items.Add(keyValue.Value);
-						PickListViewChanged();
+						PickListViewChanged(true);
 					}));
 				}
 			}
@@ -717,7 +798,15 @@ namespace EbayLeaveBulkFeedback
 					ItemArrivedWithinEDDType = ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange
 				};
 
-				string result = leaveFeedbackCall.LeaveFeedback(giveFeedbackTo, itemId, CommentTypeCodeType.Positive, feedback);
+				if (transactionId != null)
+				{
+					// make sure the transaction ID doesn't have a dash
+					var split = transactionId.Split('-');
+					if (split.Length >= 2)
+						transactionId = split[1];
+				}
+
+				string result = leaveFeedbackCall.LeaveFeedback(giveFeedbackTo, itemId, transactionId, CommentTypeCodeType.Positive, feedback);
 
 				var updates = new FeedbackUpdates()
 				{
@@ -730,9 +819,11 @@ namespace EbayLeaveBulkFeedback
 			catch (Exception ex)
 			{
 				string status;
+				string result = null;
 				if (ex.Message.Contains("feedback has been left already"))	
 				{
 					status = "Done";
+					result = "Feedback was already left";
 				}
 				else
 				{
@@ -741,7 +832,7 @@ namespace EbayLeaveBulkFeedback
 				var updates = new FeedbackUpdates()
 				{
 					Status = status,
-					Result = ex.Message
+					Result = result ?? ex.Message
 				};
 				FeedbackUpdate(itemId, updates);
 			}
@@ -772,6 +863,23 @@ namespace EbayLeaveBulkFeedback
 			};
 
 			return apiContext;
+		}
+
+		internal object GetEbaySessionId()
+		{
+			return null;
+
+
+
+			var apiContext = GetAppApiContext();
+			var getSessionIDCall = new GetSessionIDCall(apiContext);
+			//getSessionIDCall.
+
+		}
+
+		private ApiContext GetAppApiContext()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

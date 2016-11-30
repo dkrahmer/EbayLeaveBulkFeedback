@@ -17,6 +17,7 @@ namespace EbayLeaveBulkFeedback
 	{
 		public Action<string> PickItemsAction { get; set; }
 		private DataManager _dataManager;
+		const int PICK_SUBITEM_ITEM_ID = 2;
 
 		public ItemPickDialog(DataManager dataManager)
 		{
@@ -68,9 +69,13 @@ namespace EbayLeaveBulkFeedback
 				pickListView.FocusedItem.Focused = false;	// prevent the scrolling from jumping around
 		}
 		
-		private void UpdateItemCount()
+		private bool UpdateItemCount(bool resetScroll)
 		{
+			if (resetScroll && pickListView.Items.Count > 0)
+				pickListView.EnsureVisible(0);
 			toolStripItemCount.Text = "Items: " + pickListView.Items.Count.ToString();
+
+			return true;
 		}
 
 		int AddPickListViewImage(Bitmap image)
@@ -99,6 +104,74 @@ namespace EbayLeaveBulkFeedback
 		private void ItemPickDialog_Shown(object sender, EventArgs e)
 		{
 			textBoxSearch.Focus();
+		}
+
+		private void pickListView_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			if (e.KeyChar == (int)Keys.Enter)
+			{
+				_dataManager.ProcessSelectedPickListItems(PickItemsAction);
+				e.Handled = true;
+				return;
+			}
+
+			textBoxSearch.Focus();
+			SendKeys.Send(e.KeyChar.ToString());
+			e.Handled = true;
+		}
+
+		private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyValue == (int)Keys.Down
+				|| e.KeyValue == (int)Keys.Up
+				|| e.KeyValue == (int)Keys.Enter)
+			{
+				pickListView.SelectedItems.Clear();	// prevent the scrolling from jumping around
+				if (pickListView.FocusedItem != null)
+					pickListView.FocusedItem.Focused = false;	// prevent the scrolling from jumping around
+
+				if (pickListView.Items.Count > 0)
+				{
+					var firstItem = pickListView.Items[0];
+					firstItem.Selected = true;
+					firstItem.Focused = true;
+					pickListView.EnsureVisible(0);
+				}
+				pickListView.Focus();
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.F6)
+			{
+				textBoxSearch.Focus();
+				textBoxSearch.SelectAll();
+				e.Handled = true;
+			}
+		}
+
+		private void buttonRefresh_Click(object sender, EventArgs e)
+		{
+			_dataManager.InitPickListView();
+		}
+
+		private void pickListView_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.F6)
+			{
+				textBoxSearch.Focus();
+				textBoxSearch.SelectAll();
+				e.Handled = true;
+			}
+			else if (e.KeyCode == Keys.F7)
+			{
+				foreach (ListViewItem listItem in pickListView.SelectedItems)
+				{
+					string itemId = listItem.SubItems[PICK_SUBITEM_ITEM_ID].Text;
+
+					System.Diagnostics.Process.Start("http://www.ebay.com/itm/-/" + itemId + "?orig_cvip=true");
+				}
+				e.Handled = true;
+			}
+
 		}
 	}
 }

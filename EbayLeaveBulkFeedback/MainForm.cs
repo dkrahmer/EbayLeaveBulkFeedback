@@ -32,6 +32,19 @@ namespace EbayLeaveBulkFeedback
 				return _itemPickDialog;
 			}
 		}
+		private ConfigDialog _configDialog;
+		public ConfigDialog ConfigDialog
+		{
+			get
+			{
+				if (_configDialog == null || _configDialog.IsDisposed)
+				{
+					_configDialog = new ConfigDialog(_dataManager);
+				}
+
+				return _configDialog;
+			}
+		}
 
 		public MainForm(DataManager dataManager)
 		{
@@ -171,6 +184,12 @@ namespace EbayLeaveBulkFeedback
 					continue;	// don't update if it already has a status
 				_dataManager.FeedbackUpdate(item.SubItems[1].Text, updates);
 			}
+		}
+
+		private void buttonConfig_Click(object sender, EventArgs e)
+		{
+			ConfigDialog.Show();
+			ConfigDialog.BringToFront();
 		}
 	}
 }

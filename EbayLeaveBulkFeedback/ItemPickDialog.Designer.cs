@@ -33,6 +33,8 @@
 			this.EndDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ItemId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Seller = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.Price = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.TrackingNumber = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.UserProfile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
@@ -40,7 +42,7 @@
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.textBoxSearch = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.Price = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buttonRefresh = new System.Windows.Forms.Button();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -55,6 +57,7 @@
             this.ItemId,
             this.Seller,
             this.Price,
+            this.TrackingNumber,
             this.UserProfile});
 			this.pickListView.Location = new System.Drawing.Point(0, 38);
 			this.pickListView.Name = "pickListView";
@@ -64,6 +67,8 @@
 			this.pickListView.UseCompatibleStateImageBehavior = false;
 			this.pickListView.View = System.Windows.Forms.View.Tile;
 			this.pickListView.DoubleClick += new System.EventHandler(this.listViewItems_DoubleClick);
+			this.pickListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pickListView_KeyDown);
+			this.pickListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.pickListView_KeyPress);
 			this.pickListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pickListView_MouseUp);
 			// 
 			// Title
@@ -82,6 +87,16 @@
 			// 
 			this.Seller.DisplayIndex = 4;
 			this.Seller.Text = "Seller";
+			// 
+			// Price
+			// 
+			this.Price.DisplayIndex = 5;
+			this.Price.Text = "Price";
+			// 
+			// TrackingNumber
+			// 
+			this.TrackingNumber.DisplayIndex = 6;
+			this.TrackingNumber.Text = "TrackingNumber";
 			// 
 			// UserProfile
 			// 
@@ -126,6 +141,7 @@
 			this.textBoxSearch.Size = new System.Drawing.Size(348, 22);
 			this.textBoxSearch.TabIndex = 2;
 			this.textBoxSearch.TextChanged += new System.EventHandler(this.textBoxSearch_TextChanged);
+			this.textBoxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxSearch_KeyDown);
 			// 
 			// label1
 			// 
@@ -136,16 +152,23 @@
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Double-click or right-click highlighted items to pick items for feedback.";
 			// 
-			// Price
+			// buttonRefresh
 			// 
-			this.Price.DisplayIndex = 5;
-			this.Price.Text = "Price";
+			this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonRefresh.Location = new System.Drawing.Point(905, 8);
+			this.buttonRefresh.Name = "buttonRefresh";
+			this.buttonRefresh.Size = new System.Drawing.Size(100, 26);
+			this.buttonRefresh.TabIndex = 4;
+			this.buttonRefresh.Text = "Refresh";
+			this.buttonRefresh.UseVisualStyleBackColor = true;
+			this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
 			// 
 			// ItemPickDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1017, 647);
+			this.Controls.Add(this.buttonRefresh);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textBoxSearch);
 			this.Controls.Add(this.statusStrip1);
@@ -177,5 +200,7 @@
 		private System.Windows.Forms.TextBox textBoxSearch;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ColumnHeader Price;
+		private System.Windows.Forms.Button buttonRefresh;
+		private System.Windows.Forms.ColumnHeader TrackingNumber;
 	}
 }

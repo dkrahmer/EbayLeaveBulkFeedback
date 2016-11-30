@@ -24,5 +24,7 @@ namespace EbayLeaveBulkFeedback
 		public string ProfileName { get; set; }
 
 		public string OrderLineItemId { get; set; }
+
+		public string TrackingNumber { get; set; }
 	}
 }

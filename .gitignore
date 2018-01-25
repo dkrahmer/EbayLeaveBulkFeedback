@@ -2,3 +2,7 @@
 obj/
 bin/
 *.bak
+/.vs
+/packages
+/EbayLeaveBulkFeedback/App.Release.config
+/EbayLeaveBulkFeedback/App.Debug.config

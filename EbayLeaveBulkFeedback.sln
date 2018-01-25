@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EbayLeaveBulkFeedback", "EbayLeaveBulkFeedback\EbayLeaveBulkFeedback.csproj", "{15CB353F-2E1F-4969-B5AD-8D32A97C4C46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eBay.Services", "..\eBayAutoBidder\lib\FindingKitDotNet_1.0\eBay.Services\eBay.Services.csproj", "{742D29F1-BBCE-4C7F-ABA8-239DE44F8D60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7463399-27AA-40FD-80AC-53112C2E2FBA}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A85D52BD-E455-413A-8CB1-977C6FAC3EDB}
 	EndGlobalSection
 EndGlobal

@@ -17,6 +17,7 @@ namespace EbayLeaveBulkFeedback
 	{
 		public Action<string> PickItemsAction { get; set; }
 		private DataManager _dataManager;
+		private Thread _handlePressEnterAsyncThread;
 		const int PICK_SUBITEM_ITEM_ID = 2;
 
 		public ItemPickDialog(DataManager dataManager)
@@ -27,7 +28,7 @@ namespace EbayLeaveBulkFeedback
 				ImageSize = new Size(140, 140),
 				ColorDepth = ColorDepth.Depth32Bit
 			};
-			pickListView.ListViewItemSorter = new ListViewItemComparer(1);	// date
+			pickListView.ListViewItemSorter = new ListViewItemComparer(1);  // date
 			pickListView.Sort();
 			this.pickListView.Scroll += new ScrollEventHandler(listViewItems_Scroll);
 			_dataManager = dataManager;
@@ -44,8 +45,8 @@ namespace EbayLeaveBulkFeedback
 
 		private void ItemListDialog_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (e.CloseReason != CloseReason.UserClosing) 
-				return;	// Do not close if the user hit the close button
+			if (e.CloseReason != CloseReason.UserClosing)
+				return; // Do not close if the user hit the close button
 
 			Hide();
 			e.Cancel = true;
@@ -61,14 +62,14 @@ namespace EbayLeaveBulkFeedback
 			if (e.Button == MouseButtons.Right)
 				_dataManager.ProcessSelectedPickListItems(PickItemsAction);
 		}
-		
+
 		private void listViewItems_Scroll(object sender, ScrollEventArgs e)
 		{
-			pickListView.SelectedItems.Clear();	// prevent the scrolling from jumping around
+			pickListView.SelectedItems.Clear(); // prevent the scrolling from jumping around
 			if (pickListView.FocusedItem != null)
-				pickListView.FocusedItem.Focused = false;	// prevent the scrolling from jumping around
+				pickListView.FocusedItem.Focused = false;   // prevent the scrolling from jumping around
 		}
-		
+
 		private bool UpdateItemCount(bool resetScroll)
 		{
 			if (resetScroll && pickListView.Items.Count > 0)
@@ -126,18 +127,19 @@ namespace EbayLeaveBulkFeedback
 				|| e.KeyValue == (int)Keys.Up
 				|| e.KeyValue == (int)Keys.Enter)
 			{
-				pickListView.SelectedItems.Clear();	// prevent the scrolling from jumping around
-				if (pickListView.FocusedItem != null)
-					pickListView.FocusedItem.Focused = false;	// prevent the scrolling from jumping around
-
-				if (pickListView.Items.Count > 0)
+				if (e.KeyValue == (int)Keys.Enter)
 				{
-					var firstItem = pickListView.Items[0];
-					firstItem.Selected = true;
-					firstItem.Focused = true;
-					pickListView.EnsureVisible(0);
+					if (_handlePressEnterAsyncThread != null && _handlePressEnterAsyncThread.IsAlive)
+					{
+						if (_handlePressEnterAsyncThread.ThreadState == ThreadState.WaitSleepJoin)
+							try { _handlePressEnterAsyncThread.Interrupt(); } catch { }
+
+						try { _handlePressEnterAsyncThread.Abort(); } catch { }
+					}
+					_handlePressEnterAsyncThread = new Thread(new ThreadStart(HandlePressEnter)) { IsBackground = true };
+					_handlePressEnterAsyncThread.Start();
 				}
-				pickListView.Focus();
+
 				e.Handled = true;
 			}
 			else if (e.KeyCode == Keys.F6)
@@ -146,6 +148,38 @@ namespace EbayLeaveBulkFeedback
 				textBoxSearch.SelectAll();
 				e.Handled = true;
 			}
+		}
+
+		private void HandlePressEnter()
+		{
+			while (_dataManager.IsUpdateListViewAsyncThreadActive)
+			{
+				// Hack: Wait for the search thread to complete
+				Thread.Sleep(10);
+			}
+
+			pickListView.Invoke((MethodInvoker)(() =>
+			{
+
+				pickListView.SelectedItems.Clear(); // prevent the scrolling from jumping around
+				if (pickListView.FocusedItem != null)
+					pickListView.FocusedItem.Focused = false;   // prevent the scrolling from jumping around
+
+				if (pickListView.Items.Count > 0)
+				{
+					var firstItem = pickListView.Items[0];
+					firstItem.Selected = true;
+					firstItem.Focused = true;
+					pickListView.EnsureVisible(0);
+
+					if (pickListView.Items.Count == 1)
+					{
+						_dataManager.ProcessSelectedPickListItems(PickItemsAction);
+					}
+				}
+				textBoxSearch.Focus();
+				textBoxSearch.SelectAll();
+			}));
 		}
 
 		private void buttonRefresh_Click(object sender, EventArgs e)

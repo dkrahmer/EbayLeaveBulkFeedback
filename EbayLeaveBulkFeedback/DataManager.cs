@@ -35,8 +35,8 @@ namespace EbayLeaveBulkFeedback
 		public string SearchString
 		{
 			get { return _searchString; }
-			set 
-			{ 
+			set
+			{
 				_searchString = value;
 				_searchStrings = _searchString.Split(' ');
 				UpdateListViewAsync();
@@ -205,10 +205,10 @@ namespace EbayLeaveBulkFeedback
 
 			EbayItemSummary itemSummary = GetItemSummary(itemId, transactionId, orderLineItemId, profileName);
 			if (itemSummary == null)
-				return;	// item has a processed status or ebay couldn't find it
+				return; // item has a processed status or ebay couldn't find it
 			listViewItem = MasterPickListAddItem(itemSummary);
 			if (listViewItem == null)
-				return;	// duplicate?
+				return; // duplicate?
 			UpdatePickListImage(listViewItem);
 		}
 
@@ -216,7 +216,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			string sql = @"	SELECT ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, TrackingNumber, ProfileName, Status
 							FROM EbayItemsAwaitingFeedback 
-							WHERE ItemId = '" + itemId.Replace("'", "''") + @"'";	// AND (Status IS NULL OR Status = '')";
+							WHERE ItemId = '" + itemId.Replace("'", "''") + @"'";   // AND (Status IS NULL OR Status = '')";
 			DataRow row;
 			lock (DB)
 			{
@@ -226,8 +226,8 @@ namespace EbayLeaveBulkFeedback
 			if (row != null)
 			{
 				if (!string.IsNullOrEmpty(row[8] as string))
-					return null;	// The status indicates we have already processed this item
-				
+					return null;    // The status indicates we have already processed this item
+
 				var itemSummary = GetItemSummary(row);
 
 				return itemSummary;
@@ -362,7 +362,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			ListViewItem listViewItem;
 			if (_masterPickList.TryGetValue(itemSummary.ItemId, out listViewItem))
-				return null;	// no dulpicates
+				return null;    // no dulpicates
 
 			//lock (_pickListViewLock)
 			{
@@ -415,7 +415,7 @@ namespace EbayLeaveBulkFeedback
 		private EbayItemSummary GetItemSummary(DataRow row)
 		{
 			EbayItemSummary itemSummary = new EbayItemSummary()
-			{	// ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName
+			{   // ItemId, Title, Seller, TransactionId, OrderLineItemId, EndDateTime, ProfileName
 				ItemId = (string)row[0],
 				Title = (string)row[1],
 				Seller = (string)row[2],
@@ -478,11 +478,11 @@ namespace EbayLeaveBulkFeedback
 			foreach (string searchString in _searchStrings)
 			{
 				bool found =
-					listViewItem.SubItems[0].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// Title
-					|| listViewItem.SubItems[2].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0		// ItemId
-					|| listViewItem.SubItems[3].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0	// Seller
-					|| listViewItem.SubItems[5].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;	// Tracking number
-				
+					listViewItem.SubItems[0].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0        // Title
+					|| listViewItem.SubItems[2].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0     // ItemId
+					|| listViewItem.SubItems[3].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0 // Seller
+					|| listViewItem.SubItems[5].Text.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0;    // Tracking number
+
 				if (!found)
 					return false;
 			}
@@ -502,72 +502,87 @@ namespace EbayLeaveBulkFeedback
 		{
 			if (_updateListViewAsyncThread != null && _updateListViewAsyncThread.IsAlive)
 			{
-				_updateListViewAsyncThread.Interrupt();
-				_updateListViewAsyncThread.Abort();
+				if (_updateListViewAsyncThread.ThreadState == ThreadState.WaitSleepJoin)
+					try { _updateListViewAsyncThread.Interrupt(); } catch { }
+
+				try { _updateListViewAsyncThread.Abort(); } catch { }
 			}
 
 			_updateListViewAsyncThread = new Thread(new ThreadStart(UpdateListView)) { IsBackground = true };
 			_updateListViewAsyncThread.Start();
 		}
 
+		public bool IsUpdateListViewAsyncThreadActive
+		{
+			get
+			{
+				return _updateListViewAsyncThread?.IsAlive ?? false;
+			}
+		}
+
+		private static object _updateListViewLock = new object();
+
 		public void UpdateListView()
 		{
-			try
+			lock (_updateListViewLock)
 			{
-				// Apply SearchString...
-				// Make a filteredList from the master dictionary
-				var filteredList = _masterPickList.Where(item => { return IsFilterMatch(item.Value); })
-					.ToDictionary(p => p.Key, p => p.Value);
+				try
+				{
+					// Apply SearchString...
+					// Make a filteredList from the master dictionary
+					var filteredList = _masterPickList.Where(item => { return IsFilterMatch(item.Value); })
+						.ToDictionary(p => p.Key, p => p.Value);
 
-				// Loop through the _listView:
-				int itemCount = 0;
-				PickDialog.Invoke((MethodInvoker)(() => 
-				{
-					PickListView.BeginUpdate();
-					itemCount = PickListView.Items.Count;
-				}));
-				for (int i = itemCount - 1; i >= 0; i--)
-				{
-					ListViewItem listViewItem = null;
-					PickDialog.Invoke((MethodInvoker)(() => 
+					// Loop through the _listView:
+					int itemCount = 0;
+					PickDialog.Invoke((MethodInvoker)(() =>
 					{
-						listViewItem = PickListView.Items[i];
+						PickListView.BeginUpdate();
+						itemCount = PickListView.Items.Count;
 					}));
-					ListViewItem foundListViewItem;
-					string itemId = listViewItem.SubItems[2].Text;
-					if (filteredList.TryGetValue(itemId, out foundListViewItem))
+					for (int i = itemCount - 1; i >= 0; i--)
 					{
-						// remove filteredList items as they are found
-						filteredList.Remove(itemId);
-					}
-					else
-					{
-						// remove list view items not in the filteredList 
-						PickDialog.Invoke((MethodInvoker)(() => 
+						ListViewItem listViewItem = null;
+						PickDialog.Invoke((MethodInvoker)(() =>
 						{
-							PickListView.Items.RemoveAt(i);
+							listViewItem = PickListView.Items[i];
+						}));
+						ListViewItem foundListViewItem;
+						string itemId = listViewItem.SubItems[2].Text;
+						if (filteredList.TryGetValue(itemId, out foundListViewItem))
+						{
+							// remove filteredList items as they are found
+							filteredList.Remove(itemId);
+						}
+						else
+						{
+							// remove list view items not in the filteredList 
+							PickDialog.Invoke((MethodInvoker)(() =>
+							{
+								PickListView.Items.RemoveAt(i);
+								PickListViewChanged(true);
+							}));
+						}
+					}
+
+					// Add all items in filteredList to the _listView
+					foreach (var keyValue in filteredList)
+					{
+						PickDialog.Invoke((MethodInvoker)(() =>
+						{
+							PickListView.Items.Add(keyValue.Value);
 							PickListViewChanged(true);
 						}));
 					}
 				}
-
-				// Add all items in filteredList to the _listView
-				foreach (var keyValue in filteredList)
+				catch (Exception ex)
 				{
-					PickDialog.Invoke((MethodInvoker)(() => 
-					{
-						PickListView.Items.Add(keyValue.Value);
-						PickListViewChanged(true);
-					}));
+					LogException(ex);
 				}
-			}
-			catch (Exception ex)
-			{
-				LogException(ex);
-			}
-			finally
-			{
-				PickDialog.Invoke((MethodInvoker)(() => { PickListView.EndUpdate(); }));
+				finally
+				{
+					PickDialog.Invoke((MethodInvoker)(() => { PickListView.EndUpdate(); }));
+				}
 			}
 		}
 
@@ -584,15 +599,15 @@ namespace EbayLeaveBulkFeedback
 			if (_feedbackList.TryGetValue(itemId, out listViewItem))
 			{
 				var data = new Dictionary<string, object>();
-				if (updates.Status != null) MainForm.Invoke((MethodInvoker)(() => 
-				{ 
+				if (updates.Status != null) MainForm.Invoke((MethodInvoker)(() =>
+				{
 					listViewItem.SubItems[0].Text = updates.Status;
 					data["Status"] = updates.Status;
 				}));
 				if (updates.Title != null) MainForm.Invoke((MethodInvoker)(() => { listViewItem.SubItems[2].Text = updates.Title; }));
 				if (updates.Seller != null) MainForm.Invoke((MethodInvoker)(() => { listViewItem.SubItems[3].Text = updates.Seller; }));
-				if (updates.FeedbackLeft != null) MainForm.Invoke((MethodInvoker)(() => 
-				{ 
+				if (updates.FeedbackLeft != null) MainForm.Invoke((MethodInvoker)(() =>
+				{
 					listViewItem.SubItems[4].Text = updates.FeedbackLeft;
 					data["FeedbackLeft"] = updates.FeedbackLeft;
 				}));
@@ -637,7 +652,7 @@ namespace EbayLeaveBulkFeedback
 				{
 					ListViewItem listViewItem;
 					if (newFeedbackList.TryGetValue(itemId, out listViewItem))
-						continue;	// no dupes
+						continue;   // no dupes
 
 					if (_feedbackList.TryGetValue(itemId, out listViewItem))
 					{
@@ -691,13 +706,13 @@ namespace EbayLeaveBulkFeedback
 
 		private ListViewItem GetFeedbackListViewItem(string itemId)
 		{
-			string status			= null;
-			string title			= null;
-			string sellerName		= null;
-			string feedbackLeft		= null;
-			string transactionId	= null;
-			string orderLineItemId	= null;
-			string profileName		= null;
+			string status = null;
+			string title = null;
+			string sellerName = null;
+			string feedbackLeft = null;
+			string transactionId = null;
+			string orderLineItemId = null;
+			string profileName = null;
 
 			// Get from DB
 			string sql = @"	SELECT Status, Title, Seller, FeedbackLeft, TransactionId, OrderLineItemId, ProfileName, Price
@@ -711,13 +726,13 @@ namespace EbayLeaveBulkFeedback
 
 			if (row != null)
 			{
-				status			= row[0] as string;
-				title			= row[1] as string;
-				sellerName		= row[2] as string;
-				feedbackLeft	= row[3] as string;
-				transactionId	= row[4] as string;
-				orderLineItemId	= row[5] as string;
-				profileName		= row[6] as string;
+				status = row[0] as string;
+				title = row[1] as string;
+				sellerName = row[2] as string;
+				feedbackLeft = row[3] as string;
+				transactionId = row[4] as string;
+				orderLineItemId = row[5] as string;
+				profileName = row[6] as string;
 			}
 			var newItem = new string[] { status, itemId, title, sellerName, feedbackLeft, null, transactionId, orderLineItemId, profileName };
 			var listViewItem = new ListViewItem(newItem);
@@ -746,7 +761,7 @@ namespace EbayLeaveBulkFeedback
 			Action<string, int?> generalStatusUpdate = (Action<string, int?>)argsArray[2];
 
 			MainForm.Invoke((MethodInvoker)(() => { before(); }));
-			
+
 			try
 			{
 				var feedbackToSellers = ConfigurationManager.AppSettings["FeedbackToSellers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
@@ -775,7 +790,7 @@ namespace EbayLeaveBulkFeedback
 				LogException(ex);
 			}
 
-			MainForm.Invoke((MethodInvoker)(() => 
+			MainForm.Invoke((MethodInvoker)(() =>
 			{
 				after();
 			}));
@@ -820,7 +835,7 @@ namespace EbayLeaveBulkFeedback
 			{
 				string status;
 				string result = null;
-				if (ex.Message.Contains("feedback has been left already"))	
+				if (ex.Message.Contains("feedback has been left already"))
 				{
 					status = "Done";
 					result = "Feedback was already left";

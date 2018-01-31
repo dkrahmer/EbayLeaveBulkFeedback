@@ -528,6 +528,7 @@ namespace EbayLeaveBulkFeedback
 			{
 				try
 				{
+					Thread.Sleep(50); // wait in case we get killed. This makes fast typing less processor intensive, like for barcode scanners.
 					// Apply SearchString...
 					// Make a filteredList from the master dictionary
 					var filteredList = _masterPickList.Where(item => { return IsFilterMatch(item.Value); })

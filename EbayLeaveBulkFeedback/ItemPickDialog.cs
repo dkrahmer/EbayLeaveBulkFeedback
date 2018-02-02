@@ -167,15 +167,14 @@ namespace EbayLeaveBulkFeedback
 
 				if (pickListView.Items.Count > 0)
 				{
-					var firstItem = pickListView.Items[0];
-					firstItem.Selected = true;
-					firstItem.Focused = true;
-					pickListView.EnsureVisible(0);
-
-					if (pickListView.Items.Count == 1)
+					foreach (ListViewItem item in pickListView.Items)
 					{
-						_dataManager.ProcessSelectedPickListItems(PickItemsAction);
+						item.Selected = true;
+						item.Focused = true;
+						pickListView.EnsureVisible(0);
 					}
+
+					_dataManager.ProcessSelectedPickListItems(PickItemsAction);
 				}
 				textBoxSearch.Focus();
 				textBoxSearch.SelectAll();

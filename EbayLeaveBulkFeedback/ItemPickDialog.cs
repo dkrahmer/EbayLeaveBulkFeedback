@@ -160,7 +160,6 @@ namespace EbayLeaveBulkFeedback
 
 			pickListView.Invoke((MethodInvoker)(() =>
 			{
-
 				pickListView.SelectedItems.Clear(); // prevent the scrolling from jumping around
 				if (pickListView.FocusedItem != null)
 					pickListView.FocusedItem.Focused = false;   // prevent the scrolling from jumping around

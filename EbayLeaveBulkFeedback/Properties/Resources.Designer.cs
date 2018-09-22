@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ebayLeaveFeedbackForSellers.Properties
+namespace EbayLeaveBulkFeedback.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace ebayLeaveFeedbackForSellers.Properties
 			{
 				if ((resourceMan == null))
 				{
-					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ebayLeaveFeedbackForSellers.Properties.Resources", typeof(Resources).Assembly);
+					global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EbayLeaveBulkFeedback.Properties.Resources", typeof(Resources).Assembly);
 					resourceMan = temp;
 				}
 				return resourceMan;

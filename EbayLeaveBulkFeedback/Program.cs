@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ebayLeaveFeedbackForSellers
+namespace EbayLeaveBulkFeedback
 {
 	static class Program
 	{
@@ -16,7 +16,8 @@ namespace ebayLeaveFeedbackForSellers
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			var dataManager = new DataManager();
+			Application.Run(new MainForm(dataManager));
 		}
 	}
 }

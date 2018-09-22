@@ -10,142 +10,123 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ebayLeaveFeedbackForSellers
+namespace EbayLeaveBulkFeedback
 {
 	public partial class MainForm : Form
 	{
-		Dictionary<string, ListViewItem> _items;
-		Thread _listViewUpdaterThread;
+		private DataManager _dataManager;
 		Thread _leaveFeedbackThread;
+		private ItemPickDialog _itemPickDialog;
+		public ItemPickDialog ItemPickDialog
+		{
+			get
+			{
+				if (_itemPickDialog == null)
+				{
+					_itemPickDialog = new ItemPickDialog(_dataManager)
+					{
+						PickItemsAction = AddRawItem
+					};
+				}
 
-		public MainForm()
+				return _itemPickDialog;
+			}
+		}
+		private ConfigDialog _configDialog;
+		public ConfigDialog ConfigDialog
+		{
+			get
+			{
+				if (_configDialog == null || _configDialog.IsDisposed)
+				{
+					_configDialog = new ConfigDialog(_dataManager);
+				}
+
+				return _configDialog;
+			}
+		}
+
+		public MainForm(DataManager dataManager)
 		{
 			InitializeComponent();
+			_dataManager = dataManager;
+			_dataManager.MainForm = this;
+			_dataManager.FeedbackListViewChanged = UpdateItemCount;
+			_dataManager.TextBoxRawFeedbackData = textBoxRawData;
+			_dataManager.FeedbackListView = feedbackListView;
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			ResetGui();
-			UpdateListViewAsync();
-		}
-
-		private void textBoxRawData_TextChanged(object sender, EventArgs e)
-		{
-			UpdateListViewAsync();
-		}
-
-		private void UpdateListViewAsync(object isThread = null)
-		{
-			if (isThread == null)
-			{
-				if (_listViewUpdaterThread != null && _listViewUpdaterThread.IsAlive)
-				{
-					_listViewUpdaterThread.Abort();
-				}
-
-				_listViewUpdaterThread = new Thread(new ParameterizedThreadStart(UpdateListViewAsync));
-				_listViewUpdaterThread.Start(true);
-				return;
-			}
-			//var itemIds = Helpers.ExtractNumberStrings(textBoxRawData.Text, "(?i)(([^\\d]|^)?(?<target>\\d{12,13})([^\\d]|$)?)+");
-			// var itemIds = Helpers.ExtractNumberStrings(textBoxRawData.Text, "(\\d+)");
-
-			string[] itemIds = null;
-			Invoke((MethodInvoker)(() => { itemIds = Helpers.ExtractStringsByRegex(textBoxRawData.Text, "(\\d+)"); }));
-
-			_items = new Dictionary<string, ListViewItem>();
-			_items.Clear();
-
-			Invoke((MethodInvoker)(() => { listViewItems.Items.Clear(); }));
-			foreach (var itemId in itemIds)
-			{
-				if (itemId.Length < 12 || itemId.Length > 12)	// allow for a length range
-					continue;
-				ListViewItem listViewItem;
-				if (_items.TryGetValue(itemId, out listViewItem))
-					continue;	// no dupes
-
-				var newItem = new string[] { null, itemId, null, null, null, null };
-				listViewItem = new ListViewItem(newItem);
-				_items.Add(itemId, listViewItem);
-
-				Invoke((MethodInvoker)(() => { listViewItems.Items.Add(listViewItem); }));
-			}
-
-			Invoke((MethodInvoker)(() => { labelItemCount.Text = "Item count: " + listViewItems.Items.Count.ToString(); }));
-		}
-
-		private void buttonLeaveFeedback_Click(object sender, EventArgs e)
-		{
-			LeaveFeedbackAsync();
-		}
-
-		private void LeaveFeedbackAsync(object isThread = null)
-		{
-			if (isThread == null)
-			{
-				if (_leaveFeedbackThread != null && _leaveFeedbackThread.IsAlive)
-				{
-					_leaveFeedbackThread.Abort();
-				}
-
-				_leaveFeedbackThread = new Thread(new ParameterizedThreadStart(LeaveFeedbackAsync));
-				_leaveFeedbackThread.Start(true);
-				return;
-			}
-
-			Invoke((MethodInvoker)(() => { EnableDisableAll(false); }));
-			
-			var ebayLeaveFeedback = new EbayLeaveFeedback();
-			var items = new HashSet<string>(_items.Keys);
-			try
-			{
-				int feedbacksLeft = ebayLeaveFeedback.LeaveFeedbacks(items, GeneralStatusUpdate, FeedbackUpdate);
-			}
-			catch (Exception ex)
-			{
-
-			}
-
-			Invoke((MethodInvoker)(() => { ResetGui(); }));
+			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
 		private void ResetGui()
 		{
-			EnableDisableAll(true);
-			GeneralStatusUpdate("Ready", 0);
+			Invoke((MethodInvoker)(() =>
+			{
+				EnableDisableAll(true);
+				GeneralStatusUpdate("Ready", 0);
+			}));
+		}
+
+		private void textBoxRawData_TextChanged(object sender, EventArgs e)
+		{
+			_dataManager.UpdateFeedbackListViewAsync();
+		}
+
+		private void AddRawItem(string itemInfo)
+		{
+			textBoxRawData.Text += "\r\n" + itemInfo;
+		}
+
+		private void SanitizeList()
+		{
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			foreach (ListViewItem listViewItem in feedbackListView.Items)
+			{
+				sb.Append((i++ == 0 ? string.Empty : " ") + listViewItem.SubItems[1].Text);
+			}
+
+			textBoxRawData.Text = sb.ToString();
+		}
+
+		private void buttonLeaveFeedback_Click(object sender, EventArgs e)
+		{
+			_leaveFeedbackThread = _dataManager.LeaveFeedbacksAsync(() => { EnableDisableAll(false); },
+				ResetGui,
+				GeneralStatusUpdate);
 		}
 
 		private void EnableDisableAll(bool enabled)
 		{
-			textBoxRawData.Enabled = enabled;
-			buttonLeaveFeedback.Enabled = enabled;
-			buttonStop.Enabled = !enabled;
+			Invoke((MethodInvoker)(() =>
+			{
+				textBoxRawData.Enabled = enabled;
+				buttonLeaveFeedback.Enabled = enabled;
+				buttonStop.Enabled = !enabled;
+			}));
 		}
 
 		private void GeneralStatusUpdate(string status, int? percentComplete)
 		{
-			if (status != null)
-				Invoke((MethodInvoker)(() => { ((ToolStripStatusLabel)(statusStrip.Items["toolStripStatusLabel"])).Text = status; }));
+			Invoke((MethodInvoker)(() =>
+			{
+				if (status != null)
+					((ToolStripStatusLabel)(statusStrip.Items["toolStripStatusLabel"])).Text = status;
 
-			if (percentComplete.HasValue)
-				Invoke((MethodInvoker)(() => { ((ToolStripProgressBar)(statusStrip.Items["toolStripProgressBar"])).Value = percentComplete.Value; }));
+				if (percentComplete.HasValue)
+					((ToolStripProgressBar)(statusStrip.Items["toolStripProgressBar"])).Value = percentComplete.Value;
+			}));
 		}
-
+		/*
 		private void FeedbackUpdate(string itemId, FeedbackUpdates updates)
 		{
-			ListViewItem listViewItem;
-			if (_items.TryGetValue(itemId, out listViewItem))
-			{
-				if (updates.Status != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[0].Text = updates.Status; }));
-				//if (updates.ItemId != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[1].Text = updates.ItemId; }));
-				if (updates.Title != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[2].Text = updates.Title; }));
-				if (updates.Seller != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[3].Text = updates.Seller; }));
-				if (updates.FeedbackLeft != null)	Invoke((MethodInvoker)(() => { listViewItem.SubItems[4].Text = updates.FeedbackLeft; }));
-				if (updates.Result != null)			Invoke((MethodInvoker)(() => { listViewItem.SubItems[5].Text = updates.Result; }));
-			}
+			_dataManager.FeedbackUpdate(itemId, updates);
 		}
-
+		*/
 		private void buttonStop_Click(object sender, EventArgs e)
 		{
 			if (_leaveFeedbackThread != null && _leaveFeedbackThread.IsAlive)
@@ -158,14 +139,57 @@ namespace ebayLeaveFeedbackForSellers
 
 		private void buttonSanitizeList_Click(object sender, EventArgs e)
 		{
-			StringBuilder sb = new StringBuilder();
-			int i = 0;
-			foreach (ListViewItem listViewItem in listViewItems.Items)
+			SanitizeList();
+		}
+
+		private void buttonClearCompleted_Click(object sender, EventArgs e)
+		{
+			foreach (ListViewItem listViewItem in feedbackListView.Items)
 			{
-				sb.Append((i++ == 0 ? string.Empty : " ") + listViewItem.SubItems[1].Text);
+				string status = listViewItem.SubItems[0].Text;
+				if (status == "Done" || status == "Ignore")
+					Invoke((MethodInvoker)(() => { feedbackListView.Items.Remove(listViewItem); }));
 			}
 
-			textBoxRawData.Text = sb.ToString();
+			SanitizeList();
+		}
+
+		private void buttonItemPicker_Click(object sender, EventArgs e)
+		{
+			ShowItemPicker();
+		}
+
+		private void ShowItemPicker()
+		{
+			ItemPickDialog.WindowState = FormWindowState.Maximized;
+			ItemPickDialog.Show();
+			ItemPickDialog.BringToFront();
+		}
+
+		private void UpdateItemCount()
+		{
+			toolStripItemCount.Text = "Items: " + feedbackListView.Items.Count.ToString();
+		}
+
+		private void buttonIgnoreListed_Click(object sender, EventArgs e)
+		{
+			var updates = new FeedbackUpdates()
+			{
+				Status = "Ignore"
+			};
+
+			foreach (ListViewItem item in feedbackListView.Items)
+			{
+				if (!string.IsNullOrEmpty(item.SubItems[0].Text))
+					continue;	// don't update if it already has a status
+				_dataManager.FeedbackUpdate(item.SubItems[1].Text, updates);
+			}
+		}
+
+		private void buttonConfig_Click(object sender, EventArgs e)
+		{
+			ConfigDialog.Show();
+			ConfigDialog.BringToFront();
 		}
 	}
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ebayLeaveFeedbackForSellers.Properties
+namespace EbayLeaveBulkFeedback.Properties
 {
 
 

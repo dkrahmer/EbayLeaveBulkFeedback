@@ -13,7 +13,7 @@ using eBay.Services;
 using System.Threading;
 using EbayLeaveBulkFeedback;
 
-namespace ebayLeaveFeedbackForSellers
+namespace EbayLeaveBulkFeedback
 {
 	class EbayLeaveFeedback
 	{
@@ -96,7 +96,6 @@ namespace ebayLeaveFeedbackForSellers
 
 					if (!itemIds.Contains(awaitingFeedbackItem.Item.ItemID))
 						continue;
-
 					uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);	// A Hashset will only keep a single instance of unique values
 
 					allAwaitingFeedbackItems.Add(awaitingFeedbackItem);
@@ -107,6 +106,7 @@ namespace ebayLeaveFeedbackForSellers
 						{
 							Seller = awaitingFeedbackItem.Item.Seller.UserID,
 							Title = awaitingFeedbackItem.Item.Title,
+							TransactionId = awaitingFeedbackItem.TransactionID,
 							Status = "Pending"
 						};
 
@@ -185,7 +185,8 @@ namespace ebayLeaveFeedbackForSellers
 				}
 				catch (Exception ex)
 				{
-
+					int i = 0;
+					i++;
 				}
 
 				feedbackItemNumber++;

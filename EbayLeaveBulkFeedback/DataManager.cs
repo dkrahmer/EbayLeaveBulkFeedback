@@ -1,32 +1,29 @@
-﻿using Community.CsharpSqlite.SQLiteClient;
-using eBay.Service.Call;
+﻿using eBay.Service.Call;
 using eBay.Service.Core.Sdk;
 using eBay.Service.Core.Soap;
-using eBay.Service.Util;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace EbayLeaveBulkFeedback
 {
 	public class DataManager
 	{
-		const int PICK_SUBITEM_TITLE = 0;
-		const int PICK_SUBITEM_DATE = 1;
-		const int PICK_SUBITEM_ITEM_ID = 2;
+		private const int PICK_SUBITEM_TITLE = 0;
+		private const int PICK_SUBITEM_DATE = 1;
+		private const int PICK_SUBITEM_ITEM_ID = 2;
+
+		private List<string> _feedbackListingIds = new List<string>();
 
 		private Dictionary<string, ListViewItem> _masterPickList;
-		private Dictionary<string, ListViewItem> _feedbackList;
+		private Dictionary<string, ListViewItem> _feedbackListViewItems;
 		public ListView FeedbackListView { get; set; }
 		public ListView PickListView { get; set; }
 		public RichTextBox TextBoxRawFeedbackData;
@@ -49,14 +46,14 @@ namespace EbayLeaveBulkFeedback
 		public Func<bool, bool> PickListViewChanged { get; set; }
 		public Func<Bitmap, int> AddPickListViewImage { get; set; }
 
-		Thread _listViewUpdaterThread;
-		Thread _initPickListViewThread;
-		Thread _leaveFeedbackThread;
+		private Thread _listViewUpdaterThread;
+		private Thread _initPickListViewThread;
+		private Thread _leaveFeedbackThread;
 
 		public DataManager()
 		{
 			_masterPickList = new Dictionary<string, ListViewItem>();
-			_feedbackList = new Dictionary<string, ListViewItem>();
+			_feedbackListViewItems = new Dictionary<string, ListViewItem>();
 		}
 
 		private SQLiteDatabase _db;
@@ -127,7 +124,7 @@ namespace EbayLeaveBulkFeedback
 				PickDialog.Invoke((MethodInvoker)(() =>
 				{
 					PickListView.Items.Clear();
-					PickListViewChanged(false);
+					PickListViewChanged?.Invoke(false);
 				}));
 				// load all records from database that have Status = '' to _listView
 				lock (DB)
@@ -192,15 +189,15 @@ namespace EbayLeaveBulkFeedback
 						return;
 					}
 				}
-				int imageIndex = AddPickListViewImage(galleryImage);
-				PickDialog.Invoke((MethodInvoker)(() => { listViewItem.ImageIndex = imageIndex; }));
+				int? imageIndex = AddPickListViewImage?.Invoke(galleryImage);
+				if (imageIndex.HasValue)
+					PickDialog.Invoke((MethodInvoker)(() => { listViewItem.ImageIndex = imageIndex.Value; }));
 			}
 		}
 
 		private void MasterPickListAddItemAction(string itemId, string orderLineItemId, string transactionId, string profileName)
 		{
-			ListViewItem listViewItem;
-			if (_masterPickList.TryGetValue(itemId, out listViewItem))
+			if (_masterPickList.TryGetValue(itemId, out ListViewItem listViewItem))
 				return;
 
 			EbayItemSummary itemSummary = GetItemSummary(itemId, transactionId, orderLineItemId, profileName);
@@ -360,8 +357,7 @@ namespace EbayLeaveBulkFeedback
 
 		private ListViewItem MasterPickListAddItem(EbayItemSummary itemSummary)
 		{
-			ListViewItem listViewItem;
-			if (_masterPickList.TryGetValue(itemSummary.ItemId, out listViewItem))
+			if (_masterPickList.TryGetValue(itemSummary.ItemId, out ListViewItem listViewItem))
 				return null;    // no dulpicates
 
 			//lock (_pickListViewLock)
@@ -373,7 +369,7 @@ namespace EbayLeaveBulkFeedback
 					PickDialog.Invoke((MethodInvoker)(() =>
 					{
 						PickListView.Items.Add(listViewItem);
-						PickListViewChanged(false);
+						PickListViewChanged?.Invoke(false);
 					}));
 				}
 
@@ -391,7 +387,7 @@ namespace EbayLeaveBulkFeedback
 				//if (itemSummary.GalleryImage == null)
 				//	return null;
 
-				//int imageIndex = AddPickListViewImage(itemSummary.GalleryImage);
+				//int imageIndex = AddPickListViewImage?.Invoke(itemSummary.GalleryImage);
 
 				var listViewItem = new ListViewItem(itemSummary.Title);
 				listViewItem.SubItems.Add(itemSummary.EndDateTime.ToString("yyyy-MM-dd"));
@@ -445,16 +441,17 @@ namespace EbayLeaveBulkFeedback
 			return itemSummary;
 		}
 
-		public void ProcessSelectedPickListItems(Action<string> processListItem)
+		public void ProcessSelectedPickListItems(Action<string> processListingId)
 		{
-			if (processListItem != null && PickListView.SelectedItems.Count > 0)
+			if (processListingId != null && PickListView.SelectedItems.Count > 0)
 			{
 				foreach (ListViewItem listItem in PickListView.SelectedItems)
 				{
-					string title = listItem.SubItems[PICK_SUBITEM_TITLE].Text;
-					string date = listItem.SubItems[PICK_SUBITEM_DATE].Text;
+					// string title = listItem.SubItems[PICK_SUBITEM_TITLE].Text;
+					// string date = listItem.SubItems[PICK_SUBITEM_DATE].Text;
 					string itemId = listItem.SubItems[PICK_SUBITEM_ITEM_ID].Text;
-					processListItem(itemId + " - " + date + " - " + title);
+					// processListingId(itemId + " - " + date + " - " + title);
+					processListingId(itemId);
 
 					listItem.BackColor = Color.Yellow;
 				}
@@ -520,7 +517,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private static object _updateListViewLock = new object();
+		private static readonly object _updateListViewLock = new object();
 
 		public void UpdateListView()
 		{
@@ -529,8 +526,8 @@ namespace EbayLeaveBulkFeedback
 				try
 				{
 					Thread.Sleep(50); // wait in case we get killed. This makes fast typing less processor intensive, like for barcode scanners.
-					// Apply SearchString...
-					// Make a filteredList from the master dictionary
+									  // Apply SearchString...
+									  // Make a filteredList from the master dictionary
 					var filteredList = _masterPickList.Where(item => { return IsFilterMatch(item.Value); })
 						.ToDictionary(p => p.Key, p => p.Value);
 
@@ -548,9 +545,8 @@ namespace EbayLeaveBulkFeedback
 						{
 							listViewItem = PickListView.Items[i];
 						}));
-						ListViewItem foundListViewItem;
 						string itemId = listViewItem.SubItems[2].Text;
-						if (filteredList.TryGetValue(itemId, out foundListViewItem))
+						if (filteredList.TryGetValue(itemId, out ListViewItem foundListViewItem))
 						{
 							// remove filteredList items as they are found
 							filteredList.Remove(itemId);
@@ -561,7 +557,7 @@ namespace EbayLeaveBulkFeedback
 							PickDialog.Invoke((MethodInvoker)(() =>
 							{
 								PickListView.Items.RemoveAt(i);
-								PickListViewChanged(true);
+								PickListViewChanged?.Invoke(true);
 							}));
 						}
 					}
@@ -572,7 +568,7 @@ namespace EbayLeaveBulkFeedback
 						PickDialog.Invoke((MethodInvoker)(() =>
 						{
 							PickListView.Items.Add(keyValue.Value);
-							PickListViewChanged(true);
+							PickListViewChanged?.Invoke(true);
 						}));
 					}
 				}
@@ -596,8 +592,7 @@ namespace EbayLeaveBulkFeedback
 
 		public void FeedbackUpdate(string itemId, FeedbackUpdates updates)
 		{
-			ListViewItem listViewItem;
-			if (_feedbackList.TryGetValue(itemId, out listViewItem))
+			if (_feedbackListViewItems.TryGetValue(itemId, out ListViewItem listViewItem))
 			{
 				var data = new Dictionary<string, object>();
 				if (updates.Status != null) MainForm.Invoke((MethodInvoker)(() =>
@@ -639,23 +634,14 @@ namespace EbayLeaveBulkFeedback
 
 			try
 			{
-				string[] itemIds = null;
-				MainForm.Invoke((MethodInvoker)(() => { itemIds = Helpers.ExtractStringsByRegex(TextBoxRawFeedbackData.Text, "(\\d+)"); }));
-				itemIds = itemIds.Where((itemId) => { return itemId.Length == 12; }).ToArray();
-				//HashSet<string> hashItemIds = new HashSet<string>();
-				//foreach (string itemId in itemIds)
-				//{
-				//	hashItemIds.Add(itemId);
-				//}
 				var newFeedbackList = new Dictionary<string, ListViewItem>();
 
-				foreach (var itemId in itemIds)
+				foreach (var itemId in _feedbackListingIds)
 				{
-					ListViewItem listViewItem;
-					if (newFeedbackList.TryGetValue(itemId, out listViewItem))
+					if (newFeedbackList.TryGetValue(itemId, out ListViewItem listViewItem))
 						continue;   // no dupes
 
-					if (_feedbackList.TryGetValue(itemId, out listViewItem))
+					if (_feedbackListViewItems.TryGetValue(itemId, out listViewItem))
 					{
 						// we already had this item so keep it
 						newFeedbackList[itemId] = listViewItem;
@@ -668,15 +654,12 @@ namespace EbayLeaveBulkFeedback
 					}
 				}
 
-				_feedbackList.Clear();
+				_feedbackListViewItems.Clear();
 				MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.BeginUpdate(); FeedbackListView.Items.Clear(); }));
 				foreach (var newFeedback in newFeedbackList)
 				{
 					FeedbackListAddItem(newFeedback.Key, newFeedback.Value, false);
 				}
-				MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.EndUpdate(); FeedbackListViewChanged(); }));
-
-				MainForm.Invoke((MethodInvoker)(() => { _listViewUpdaterThread = null; }));
 			}
 			catch (Exception ex)
 			{
@@ -684,25 +667,30 @@ namespace EbayLeaveBulkFeedback
 			}
 			finally
 			{
-				MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.EndUpdate(); }));
+				MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.EndUpdate(); FeedbackListViewChanged?.Invoke(); }));
+
+				MainForm.Invoke((MethodInvoker)(() => { _listViewUpdaterThread = null; }));
 			}
 		}
+
+
+
 		/*
 		private void FeedbackListAddItem(string itemId)
 		{
 			var listViewItem = GetFeedbackListViewItem(itemId);
 			_feedbackList[itemId] = listViewItem;
 
-			MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.Items.Add(listViewItem); FeedbackListViewChanged(); }));
+			MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.Items.Add(listViewItem); FeedbackListViewChanged?.Invoke(); }));
 		}
 		*/
 		private void FeedbackListAddItem(string itemId, ListViewItem listViewItem, bool triggerChangeEvent = true)
 		{
-			_feedbackList[itemId] = listViewItem;
+			_feedbackListViewItems[itemId] = listViewItem;
 
 			MainForm.Invoke((MethodInvoker)(() => { FeedbackListView.Items.Add(listViewItem); }));
 			if (triggerChangeEvent)
-				MainForm.Invoke((MethodInvoker)(() => { FeedbackListViewChanged(); }));
+				MainForm.Invoke((MethodInvoker)(() => { FeedbackListViewChanged?.Invoke(); }));
 		}
 
 		private ListViewItem GetFeedbackListViewItem(string itemId)
@@ -767,7 +755,7 @@ namespace EbayLeaveBulkFeedback
 			{
 				var feedbackToSellers = ConfigurationManager.AppSettings["FeedbackToSellers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 				Random random = new Random();
-				foreach (var feedbackItem in _feedbackList)
+				foreach (var feedbackItem in _feedbackListViewItems)
 				{
 					string status = feedbackItem.Value.SubItems[0].Text;
 					if (!(string.IsNullOrEmpty(status) || status == "Error"))
@@ -858,7 +846,7 @@ namespace EbayLeaveBulkFeedback
 		/// Populate eBay SDK ApiContext object with data from application configuration file
 		/// </summary>
 		/// <returns>ApiContext object</returns>
-		ApiContext GetApiContext(string ebayUserToken)
+		private ApiContext GetApiContext(string ebayUserToken)
 		{
 			//set Api Token to access eBay Api Server
 			ApiCredential apiCredential = new ApiCredential()
@@ -887,8 +875,8 @@ namespace EbayLeaveBulkFeedback
 
 
 
-			var apiContext = GetAppApiContext();
-			var getSessionIDCall = new GetSessionIDCall(apiContext);
+			//var apiContext = GetAppApiContext();
+			//var getSessionIDCall = new GetSessionIDCall(apiContext);
 			//getSessionIDCall.
 
 		}
@@ -896,6 +884,22 @@ namespace EbayLeaveBulkFeedback
 		private ApiContext GetAppApiContext()
 		{
 			throw new NotImplementedException();
+		}
+
+		internal void AddListingId(string listingId)
+		{
+			if (_feedbackListingIds.Contains(listingId))
+				return;
+
+			_feedbackListingIds.Add(listingId);
+		}
+
+		internal void RemoveListingId(string listingId)
+		{
+			if (!_feedbackListingIds.Contains(listingId))
+				return;
+
+			_feedbackListingIds.Remove(listingId);
 		}
 	}
 }

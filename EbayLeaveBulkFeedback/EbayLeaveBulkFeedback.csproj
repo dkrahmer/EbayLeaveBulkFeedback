@@ -46,6 +46,9 @@
     <Reference Include="eBay.Services">
       <HintPath>..\lib\eBay.Services.dll</HintPath>
     </Reference>
+    <Reference Include="PlaceholderTextBox, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PlaceholderTextBox.1.3.1\lib\PlaceholderTextBox.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -72,11 +75,11 @@
     <Compile Include="EbayLeaveFeedback.cs" />
     <Compile Include="FeedbackUpdates.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="ItemPickDialog.cs">
+    <Compile Include="RawEntryDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ItemPickDialog.Designer.cs">
-      <DependentUpon>ItemPickDialog.cs</DependentUpon>
+    <Compile Include="RawEntryDialog.Designer.cs">
+      <DependentUpon>RawEntryDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="DataManager.cs" />
     <Compile Include="ListViewItemComparer.cs" />
@@ -96,8 +99,8 @@
     <EmbeddedResource Include="ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ItemPickDialog.resx">
-      <DependentUpon>ItemPickDialog.cs</DependentUpon>
+    <EmbeddedResource Include="RawEntryDialog.resx">
+      <DependentUpon>RawEntryDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

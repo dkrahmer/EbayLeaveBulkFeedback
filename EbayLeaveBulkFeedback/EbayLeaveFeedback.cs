@@ -74,7 +74,7 @@ namespace EbayLeaveBulkFeedback
 				awaitingFeedbackItems = getItemsAwaitingFeedback.GetItemsAwaitingFeedback(ItemSortTypeCodeType.EndTime, paginationType);
 				if (generalStatusUpdate != null)
 				{
-					int percentComplete = (((((paginationType.PageNumber - 1) * paginationType.EntriesPerPage) + awaitingFeedbackItems.TransactionArray.Count) * 100) / awaitingFeedbackItems.PaginationResult.TotalNumberOfEntries) / 2;
+					int percentComplete = ((((((paginationType.PageNumber ?? 1) - 1) * (paginationType.EntriesPerPage ?? 1)) + awaitingFeedbackItems.TransactionArray.Count) * 100) / (awaitingFeedbackItems.PaginationResult.TotalNumberOfEntries ?? 1)) / 2;
 					generalStatusUpdate(null, percentComplete);
 				}
 
@@ -131,7 +131,7 @@ namespace EbayLeaveBulkFeedback
 					int percentComplete = 50 + (((feedbackItemNumber * 100) / allAwaitingFeedbackItems.Count) / 2);
 					generalStatusUpdate(baseMessage + "Giving feedback to [" + giveFeedbackTo + "] for item: " + feedbackItem.Item.Title + " (" + feedbackItem.Item.ItemID + ")", percentComplete);
 				}
-				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection
+				var itemRatingDetailsTypeCollection = new List<ItemRatingDetailsType>
 				{
 					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication },
 					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed },
@@ -163,7 +163,8 @@ namespace EbayLeaveBulkFeedback
 						giveFeedbackTo,
 						itemRatingDetailsTypeCollection,
 						feedbackItem.OrderLineItemID,
-						ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange);  // eBay.Service.Core.Soap
+						ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange,
+						true);  // eBay.Service.Core.Soap
 
 					if (feedbackUpdate != null)
 					{

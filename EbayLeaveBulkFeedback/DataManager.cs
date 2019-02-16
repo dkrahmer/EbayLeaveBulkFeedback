@@ -250,9 +250,9 @@ namespace EbayLeaveBulkFeedback
 				Bitmap image = null;
 				try
 				{
-					if (!string.IsNullOrEmpty(itemDetails.PictureDetails.GalleryURL))
+					if (!string.IsNullOrEmpty(itemDetails.PictureDetails.PictureURL.FirstOrDefault()))
 					{
-						var request = WebRequest.Create(itemDetails.PictureDetails.GalleryURL);
+						var request = WebRequest.Create(itemDetails.PictureDetails.PictureURL.FirstOrDefault());
 						using (var response = request.GetResponse())
 						using (var stream = response.GetResponseStream())
 						{
@@ -267,9 +267,9 @@ namespace EbayLeaveBulkFeedback
 						OrderLineItemId = orderLineItemId,
 						Title = itemDetails.Title,
 						Seller = itemDetails.Seller.UserID,
-						GalleryImageUrl = itemDetails.PictureDetails.GalleryURL,
+						GalleryImageUrl = itemDetails.PictureDetails.PictureURL.FirstOrDefault(),
 						ProfileName = profileName,
-						EndDateTime = itemDetails.ListingDetails.EndTime,
+						EndDateTime = itemDetails.ListingDetails.EndTime ?? DateTime.Parse("12/31/2200"),
 						Price = (decimal)itemDetails.SellingStatus.ConvertedCurrentPrice.Value,
 						TrackingNumber = GetTrackingNumber(itemId, apiContext: apiContext)
 					};
@@ -339,7 +339,7 @@ namespace EbayLeaveBulkFeedback
 								+ shipment.ShipmentTrackingNumber;
 							shipmentNumber++;
 						}
-						if (trackingNumber == null && itemDetails.ShippingDetails.ShippingTypeSpecified)
+						if (trackingNumber == null && itemDetails.ShippingDetails.ShippingType.HasValue)
 							trackingNumber = string.Empty;
 
 						return trackingNumber;
@@ -794,7 +794,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			try
 			{
-				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection
+				var itemRatingDetailsTypeCollection = new List<ItemRatingDetailsType>
 				{
 					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication },
 					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed },

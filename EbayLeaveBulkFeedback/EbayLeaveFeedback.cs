@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eBay.Service.Call;
+﻿using eBay.Service.Call;
 using eBay.Service.Core.Sdk;
 using eBay.Service.Core.Soap;
 using eBay.Service.Util;
-using System.Text.RegularExpressions;
-using eBay.Services;
-using System.Threading;
-using EbayLeaveBulkFeedback;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 
 namespace EbayLeaveBulkFeedback
 {
-	class EbayLeaveFeedback
+	internal class EbayLeaveFeedback
 	{
 		public EbayLeaveFeedback()
 		{
@@ -37,7 +31,7 @@ namespace EbayLeaveBulkFeedback
 				var apiContext = GetApiContext(ebayUserToken);
 				totalFeedbacks += LeaveFeedbacks(apiContext, itemIds, generalStatusUpdate, feedbackUpdate, profileName: i.ToString());
 				if (totalFeedbacks >= itemIds.Count)
-					break;	// We already found all the items. No need to continue.
+					break;  // We already found all the items. No need to continue.
 			}
 
 			return totalFeedbacks;
@@ -92,11 +86,11 @@ namespace EbayLeaveBulkFeedback
 					var awaitingFeedbackItem = awaitingFeedbackItems.TransactionArray[awaitingFeedbackItemNumber];
 
 					if (awaitingFeedbackItem.Item == null)
-						continue;	// no item data
+						continue;   // no item data
 
 					if (!itemIds.Contains(awaitingFeedbackItem.Item.ItemID))
 						continue;
-					uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);	// A Hashset will only keep a single instance of unique values
+					uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);   // A Hashset will only keep a single instance of unique values
 
 					allAwaitingFeedbackItems.Add(awaitingFeedbackItem);
 
@@ -114,7 +108,7 @@ namespace EbayLeaveBulkFeedback
 					}
 				}
 			} while (++paginationType.PageNumber <= awaitingFeedbackItems.PaginationResult.TotalNumberOfPages
-						&& uniqueItemIdsFound.Count < itemIds.Count);	// Stop reading data if 
+						&& uniqueItemIdsFound.Count < itemIds.Count);   // Stop reading data if 
 
 			int feedbackItemNumber = 0;
 			foreach (var feedbackItem in allAwaitingFeedbackItems)
@@ -169,7 +163,7 @@ namespace EbayLeaveBulkFeedback
 						giveFeedbackTo,
 						itemRatingDetailsTypeCollection,
 						feedbackItem.OrderLineItemID,
-						ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange);	// eBay.Service.Core.Soap
+						ItemArrivedWithinEDDCodeType.BuyerIndicatedItemArrivedWithinEDDRange);  // eBay.Service.Core.Soap
 
 					if (feedbackUpdate != null)
 					{
@@ -199,7 +193,7 @@ namespace EbayLeaveBulkFeedback
 		/// Populate eBay SDK ApiContext object with data from application configuration file
 		/// </summary>
 		/// <returns>ApiContext object</returns>
-		ApiContext GetApiContext(string ebayUserToken)
+		private ApiContext GetApiContext(string ebayUserToken)
 		{
 			//set Api Token to access eBay Api Server
 			ApiCredential apiCredential = new ApiCredential()

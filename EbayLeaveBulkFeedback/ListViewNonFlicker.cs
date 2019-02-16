@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace EbayLeaveBulkFeedback
 {
@@ -14,7 +9,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			DoubleBuffered = true;
 		}
-		
+
 		public event ScrollEventHandler Scroll;
 		protected virtual void OnScroll(ScrollEventArgs e)
 		{
@@ -24,7 +19,7 @@ namespace EbayLeaveBulkFeedback
 		}
 
 		private const int WM_HSCROLL = 0x114;
-		private const int WM_VSCROLL = 0x115; 
+		private const int WM_VSCROLL = 0x115;
 		private const int WM_MOUSEWHEEL = 0x020A;
 		protected override void WndProc(ref Message m)
 		{

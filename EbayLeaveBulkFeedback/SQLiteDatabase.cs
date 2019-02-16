@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
+﻿using Community.CsharpSqlite.SQLiteClient;
+using System;
 using System.Collections;
-using System.Web.Script.Serialization;
-using Community.CsharpSqlite.SQLiteClient;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Web.Script.Serialization;
 
 namespace EbayLeaveBulkFeedback
 {
 	public class SQLiteDatabase
 	{
-		string _dbConnection;
+		private readonly string _dbConnection;
 
 		/// <summary>
 		///     Single Param Constructor for specifying the DB file.
@@ -22,7 +20,7 @@ namespace EbayLeaveBulkFeedback
 		{
 			//_dbConnection = string.Format("Data Source={0}", inputFile);  //;Version=3;
 			_dbConnection = string.Format("URI=file:{0}", inputFile);  //;Version=3;
-			//_dbConnection = connectionString;
+																	   //_dbConnection = connectionString;
 		}
 
 		/// <summary>
@@ -137,7 +135,7 @@ namespace EbayLeaveBulkFeedback
 
 			return table.Rows[0];
 		}
-		
+
 		/// <summary>
 		///     Allows the programmer to interact with the database for purposes other than a query.
 		/// </summary>

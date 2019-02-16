@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace EbayLeaveBulkFeedback
 {
-	class Helpers
+	internal class Helpers
 	{
 		/// <summary>
 		/// Extracts all numbers from the string.

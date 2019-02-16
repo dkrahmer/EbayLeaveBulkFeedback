@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace EbayLeaveBulkFeedback
 {
 	public class ListViewItemComparer : IComparer
 	{
-		private int col;
+		private readonly int col;
 		public ListViewItemComparer()
 		{
 			col = 0;

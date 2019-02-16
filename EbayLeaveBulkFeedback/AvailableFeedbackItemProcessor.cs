@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eBay.Service.Call;
+﻿using eBay.Service.Call;
 using eBay.Service.Core.Sdk;
 using eBay.Service.Core.Soap;
 using eBay.Service.Util;
-using System.Text.RegularExpressions;
-using eBay.Services;
-using System.Threading;
-using EbayLeaveBulkFeedback;
-using System.Drawing;
-using System.Net;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EbayLeaveBulkFeedback
 {
 	public class AvailableFeedbackItemProcessor
 	{
-		SQLiteDatabase _db;
+		private readonly SQLiteDatabase _db;
 
 		public AvailableFeedbackItemProcessor(SQLiteDatabase db)
 		{
@@ -98,9 +90,9 @@ namespace EbayLeaveBulkFeedback
 					try
 					{
 						if (awaitingFeedbackItem.Item == null)
-							return;	// no item data
+							return; // no item data
 
-						uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);	// A Hashset will only keep a single instance of unique values
+						uniqueItemIdsFound.Add(awaitingFeedbackItem.Item.ItemID);   // A Hashset will only keep a single instance of unique values
 
 						//var itemSummary = GetItemSummary(awaitingFeedbackItem, apiContext);
 						//allAwaitingFeedbackItems.Add(awaitingFeedbackItem);
@@ -125,7 +117,7 @@ namespace EbayLeaveBulkFeedback
 					{
 					}
 				});
-				
+
 				//uniqueItemIdsFound.Clear();
 			} while (++paginationType.PageNumber <= awaitingFeedbackItems.PaginationResult.TotalNumberOfPages);
 
@@ -137,7 +129,7 @@ namespace EbayLeaveBulkFeedback
 		/// Populate eBay SDK ApiContext object with data from application configuration file
 		/// </summary>
 		/// <returns>ApiContext object</returns>
-		ApiContext GetApiContext(string ebayUserToken)
+		private ApiContext GetApiContext(string ebayUserToken)
 		{
 			//set Api Token to access eBay Api Server
 			ApiCredential apiCredential = new ApiCredential()

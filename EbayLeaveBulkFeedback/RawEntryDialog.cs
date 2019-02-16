@@ -9,7 +9,7 @@ namespace EbayLeaveBulkFeedback
 	public partial class RawEntryDialog : Form
 	{
 		public Action<string> AddListingIdAction { get; set; }
-		public Action ListingIdsAddedAction { get; set; }	
+		public Action ListingIdsAddedAction { get; set; }
 		private DataManager _dataManager;
 		private Thread _rawListViewUpdaterThread;
 		private string[] _listingIds;
@@ -121,7 +121,7 @@ namespace EbayLeaveBulkFeedback
 					addCount++;
 				}
 				if (addCount > 0)
-				ListingIdsAddedAction?.Invoke();
+					ListingIdsAddedAction?.Invoke();
 			}
 			catch (Exception ex)
 			{

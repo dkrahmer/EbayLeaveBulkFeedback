@@ -13,9 +13,7 @@ namespace EbayLeaveBulkFeedback
 		public event ScrollEventHandler Scroll;
 		protected virtual void OnScroll(ScrollEventArgs e)
 		{
-			ScrollEventHandler handler = this.Scroll;
-			if (handler != null)
-				handler(this, e);
+			Scroll?.Invoke(this, e);
 		}
 
 		private const int WM_HSCROLL = 0x114;

@@ -90,14 +90,14 @@ namespace EbayLeaveBulkFeedback
 			this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
 			this.removeToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
 			this.removeToolStripMenuItem.Text = "&Remove";
-			this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
+			this.removeToolStripMenuItem.Click += new System.EventHandler(this.RemoveToolStripMenuItem_Click);
 			// 
 			// viewInBrowserToolStripMenuItem1
 			// 
 			this.viewInBrowserToolStripMenuItem1.Name = "viewInBrowserToolStripMenuItem1";
 			this.viewInBrowserToolStripMenuItem1.Size = new System.Drawing.Size(157, 22);
 			this.viewInBrowserToolStripMenuItem1.Text = "&View in Browser";
-			this.viewInBrowserToolStripMenuItem1.Click += new System.EventHandler(this.viewInBrowserToolStripMenuItem1_Click);
+			this.viewInBrowserToolStripMenuItem1.Click += new System.EventHandler(this.ViewInBrowserToolStripMenuItem1_Click);
 			// 
 			// splitContainer1
 			// 
@@ -139,7 +139,7 @@ namespace EbayLeaveBulkFeedback
 			this.addToolStripMenuItem.Name = "addToolStripMenuItem";
 			this.addToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
 			this.addToolStripMenuItem.Text = "&Add";
-			this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
+			this.addToolStripMenuItem.Click += new System.EventHandler(this.AddToolStripMenuItem_Click);
 			// 
 			// ignoreToolStripMenuItem
 			// 
@@ -147,14 +147,14 @@ namespace EbayLeaveBulkFeedback
 			this.ignoreToolStripMenuItem.Name = "ignoreToolStripMenuItem";
 			this.ignoreToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
 			this.ignoreToolStripMenuItem.Text = "&Ignore";
-			this.ignoreToolStripMenuItem.Click += new System.EventHandler(this.ignoreToolStripMenuItem_Click);
+			this.ignoreToolStripMenuItem.Click += new System.EventHandler(this.IgnoreToolStripMenuItem_Click);
 			// 
 			// viewInBrowserToolStripMenuItem
 			// 
 			this.viewInBrowserToolStripMenuItem.Name = "viewInBrowserToolStripMenuItem";
 			this.viewInBrowserToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
 			this.viewInBrowserToolStripMenuItem.Text = "&View in Browser";
-			this.viewInBrowserToolStripMenuItem.Click += new System.EventHandler(this.viewInBrowserToolStripMenuItem_Click);
+			this.viewInBrowserToolStripMenuItem.Click += new System.EventHandler(this.ViewInBrowserToolStripMenuItem_Click);
 			// 
 			// buttonRefresh
 			// 
@@ -166,7 +166,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonRefresh.TabIndex = 8;
 			this.buttonRefresh.Text = "Refresh";
 			this.buttonRefresh.UseVisualStyleBackColor = true;
-			this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
+			this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
 			// 
 			// textBoxSearch
 			// 
@@ -177,7 +177,7 @@ namespace EbayLeaveBulkFeedback
 			this.textBoxSearch.PlaceholderText = "Search";
 			this.textBoxSearch.Size = new System.Drawing.Size(262, 20);
 			this.textBoxSearch.TabIndex = 6;
-			this.textBoxSearch.TextChanged += new System.EventHandler(this.textBoxSearch_TextChanged);
+			this.textBoxSearch.TextChanged += new System.EventHandler(this.TextBoxSearch_TextChanged);
 			// 
 			// statusStrip
 			// 
@@ -213,7 +213,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonLeaveFeedback.TabIndex = 13;
 			this.buttonLeaveFeedback.Text = "Leave Feedback";
 			this.buttonLeaveFeedback.UseVisualStyleBackColor = true;
-			this.buttonLeaveFeedback.Click += new System.EventHandler(this.buttonLeaveFeedback_Click);
+			this.buttonLeaveFeedback.Click += new System.EventHandler(this.ButtonLeaveFeedback_Click);
 			// 
 			// buttonStop
 			// 
@@ -226,7 +226,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonStop.TabIndex = 14;
 			this.buttonStop.Text = "Stop!";
 			this.buttonStop.UseVisualStyleBackColor = true;
-			this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+			this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
 			// 
 			// toolStripItemCount
 			// 
@@ -249,7 +249,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonClearCompleted.TabIndex = 17;
 			this.buttonClearCompleted.Text = "Clear Completed";
 			this.buttonClearCompleted.UseVisualStyleBackColor = true;
-			this.buttonClearCompleted.Click += new System.EventHandler(this.buttonClearCompleted_Click);
+			this.buttonClearCompleted.Click += new System.EventHandler(this.ButtonClearCompleted_Click);
 			// 
 			// btnRawEntry
 			// 
@@ -261,7 +261,7 @@ namespace EbayLeaveBulkFeedback
 			this.btnRawEntry.TabIndex = 18;
 			this.btnRawEntry.Text = "Raw Entry...";
 			this.btnRawEntry.UseVisualStyleBackColor = true;
-			this.btnRawEntry.Click += new System.EventHandler(this.btnRawEntry_Click);
+			this.btnRawEntry.Click += new System.EventHandler(this.BtnRawEntry_Click);
 			// 
 			// buttonIgnoreSelected
 			// 
@@ -273,7 +273,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonIgnoreSelected.TabIndex = 19;
 			this.buttonIgnoreSelected.Text = "Ignore Listed Items";
 			this.buttonIgnoreSelected.UseVisualStyleBackColor = true;
-			this.buttonIgnoreSelected.Click += new System.EventHandler(this.buttonIgnoreListed_Click);
+			this.buttonIgnoreSelected.Click += new System.EventHandler(this.ButtonIgnoreListed_Click);
 			// 
 			// buttonConfig
 			// 
@@ -285,7 +285,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonConfig.TabIndex = 20;
 			this.buttonConfig.Text = "Config...";
 			this.buttonConfig.UseVisualStyleBackColor = true;
-			this.buttonConfig.Click += new System.EventHandler(this.buttonConfig_Click);
+			this.buttonConfig.Click += new System.EventHandler(this.ButtonConfig_Click);
 			// 
 			// pickListView
 			// 
@@ -309,9 +309,9 @@ namespace EbayLeaveBulkFeedback
 			this.pickListView.TileSize = new System.Drawing.Size(315, 150);
 			this.pickListView.UseCompatibleStateImageBehavior = false;
 			this.pickListView.View = System.Windows.Forms.View.Tile;
-			this.pickListView.DoubleClick += new System.EventHandler(this.listViewItems_DoubleClick);
-			this.pickListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pickListView_KeyDown);
-			this.pickListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.pickListView_KeyPress);
+			this.pickListView.DoubleClick += new System.EventHandler(this.ListViewItems_DoubleClick);
+			this.pickListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PickListView_KeyDown);
+			this.pickListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.PickListView_KeyPress);
 			// 
 			// columnHeader1
 			// 

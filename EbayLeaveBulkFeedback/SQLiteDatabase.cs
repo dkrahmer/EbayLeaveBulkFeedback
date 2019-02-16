@@ -214,9 +214,8 @@ namespace EbayLeaveBulkFeedback
 			{
 				return this.ExecuteNonQuery(string.Format("UPDATE {0} SET {1} WHERE {2};", tableName, vals, where));
 			}
-			catch (Exception ex)
+			catch //(Exception ex)
 			{
-				//returnCode = false;
 				return -1;
 			}
 			//return returnCode;
@@ -235,9 +234,8 @@ namespace EbayLeaveBulkFeedback
 			{
 				this.ExecuteNonQuery(string.Format("DELETE FROM {0}" + (string.IsNullOrEmpty(where) ? "" : " WHERE {1}") + ";", tableName, where));
 			}
-			catch (Exception ex)
+			catch //(Exception ex)
 			{
-				//MessageBox.Show(fail.Message);
 				returnCode = false;
 			}
 			return returnCode;
@@ -282,13 +280,10 @@ namespace EbayLeaveBulkFeedback
 				}
 				return this.ExecuteNonQuery(command);
 			}
-			catch (Exception ex)
+			catch //(Exception ex)
 			{
-				//MessageBox.Show(fail.Message);
-				//returnCode = false;
 				return -1;
 			}
-			//return returnCode;
 		}
 
 		private object ConvertToDbValue(object val)

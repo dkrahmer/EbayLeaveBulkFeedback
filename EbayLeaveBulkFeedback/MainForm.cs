@@ -83,12 +83,12 @@ namespace EbayLeaveBulkFeedback
 			}));
 		}
 
-		private void textBoxRawData_TextChanged(object sender, EventArgs e)
+		private void TextBoxRawData_TextChanged(object sender, EventArgs e)
 		{
 			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
-		private void buttonLeaveFeedback_Click(object sender, EventArgs e)
+		private void ButtonLeaveFeedback_Click(object sender, EventArgs e)
 		{
 			_leaveFeedbackThread = _dataManager.LeaveFeedbacksAsync(() => { EnableDisableAll(false); },
 				ResetGui,
@@ -122,7 +122,7 @@ namespace EbayLeaveBulkFeedback
 			_dataManager.FeedbackUpdate(itemId, updates);
 		}
 		*/
-		private void buttonStop_Click(object sender, EventArgs e)
+		private void ButtonStop_Click(object sender, EventArgs e)
 		{
 			if (_leaveFeedbackThread != null && _leaveFeedbackThread.IsAlive)
 			{
@@ -132,7 +132,7 @@ namespace EbayLeaveBulkFeedback
 			ResetGui();
 		}
 
-		private void buttonClearCompleted_Click(object sender, EventArgs e)
+		private void ButtonClearCompleted_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listViewItem in feedbackListView.Items)
 			{
@@ -148,7 +148,7 @@ namespace EbayLeaveBulkFeedback
 			toolStripItemCount.Text = "Items: " + feedbackListView.Items.Count.ToString();
 		}
 
-		private void buttonIgnoreListed_Click(object sender, EventArgs e)
+		private void ButtonIgnoreListed_Click(object sender, EventArgs e)
 		{
 			var updates = new FeedbackUpdates()
 			{
@@ -163,13 +163,13 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void buttonConfig_Click(object sender, EventArgs e)
+		private void ButtonConfig_Click(object sender, EventArgs e)
 		{
 			ConfigDialog.Show();
 			ConfigDialog.BringToFront();
 		}
 
-		private void btnRawEntry_Click(object sender, EventArgs e)
+		private void BtnRawEntry_Click(object sender, EventArgs e)
 		{
 			ShowRawEntryDialog();
 		}
@@ -197,7 +197,7 @@ namespace EbayLeaveBulkFeedback
 			};
 			pickListView.ListViewItemSorter = new ListViewItemComparer(1);  // date
 			pickListView.Sort();
-			this.pickListView.Scroll += new ScrollEventHandler(listViewItems_Scroll);
+			this.pickListView.Scroll += new ScrollEventHandler(ListViewItems_Scroll);
 
 			_dataManager.PickListViewChanged = UpdateItemCount;
 			_dataManager.PickListView = pickListView;
@@ -221,13 +221,13 @@ namespace EbayLeaveBulkFeedback
 		}
 		*/
 
-		private void listViewItems_DoubleClick(object sender, EventArgs e)
+		private void ListViewItems_DoubleClick(object sender, EventArgs e)
 		{
 			_dataManager.ProcessSelectedPickListItems(AddListingId);
 			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
-		private void listViewItems_Scroll(object sender, ScrollEventArgs e)
+		private void ListViewItems_Scroll(object sender, ScrollEventArgs e)
 		{
 			pickListView.SelectedItems.Clear(); // prevent the scrolling from jumping around
 			if (pickListView.FocusedItem != null)
@@ -256,12 +256,12 @@ namespace EbayLeaveBulkFeedback
 			return imageIndex;
 		}
 
-		private void buttonSearch_Click(object sender, EventArgs e)
+		private void ButtonSearch_Click(object sender, EventArgs e)
 		{
 			_dataManager.SearchString = textBoxSearch.Text;
 		}
 
-		private void textBoxSearch_TextChanged(object sender, EventArgs e)
+		private void TextBoxSearch_TextChanged(object sender, EventArgs e)
 		{
 			_dataManager.SearchString = textBoxSearch.Text;
 		}
@@ -271,7 +271,7 @@ namespace EbayLeaveBulkFeedback
 			textBoxSearch.Focus();
 		}
 
-		private void pickListView_KeyPress(object sender, KeyPressEventArgs e)
+		private void PickListView_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			if (e.KeyChar == (int)Keys.Enter)
 			{
@@ -286,7 +286,7 @@ namespace EbayLeaveBulkFeedback
 			e.Handled = true;
 		}
 
-		private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)
+		private void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyValue == (int)Keys.Down
 				|| e.KeyValue == (int)Keys.Up
@@ -346,12 +346,12 @@ namespace EbayLeaveBulkFeedback
 			}));
 		}
 
-		private void buttonRefresh_Click(object sender, EventArgs e)
+		private void ButtonRefresh_Click(object sender, EventArgs e)
 		{
 			_dataManager.InitPickListView();
 		}
 
-		private void pickListView_KeyDown(object sender, KeyEventArgs e)
+		private void PickListView_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.F6)
 			{
@@ -361,7 +361,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+		private void RemoveToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listItem in feedbackListView.SelectedItems)
 			{
@@ -371,7 +371,7 @@ namespace EbayLeaveBulkFeedback
 			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
-		private void ignoreToolStripMenuItem_Click(object sender, EventArgs e)
+		private void IgnoreToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listItem in pickListView.SelectedItems)
 			{
@@ -380,7 +380,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void addToolStripMenuItem_Click(object sender, EventArgs e)
+		private void AddToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listItem in pickListView.SelectedItems)
 			{
@@ -391,7 +391,7 @@ namespace EbayLeaveBulkFeedback
 			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
-		private void viewInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ViewInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listItem in pickListView.SelectedItems)
 			{
@@ -401,7 +401,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void viewInBrowserToolStripMenuItem1_Click(object sender, EventArgs e)
+		private void ViewInBrowserToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem listItem in feedbackListView.SelectedItems)
 			{

@@ -274,19 +274,21 @@ namespace EbayLeaveBulkFeedback
 						TrackingNumber = GetTrackingNumber(itemId, apiContext: apiContext)
 					};
 
-					var data = new Dictionary<string, object>();
-					data["ItemId"] = itemId;
-					data["TransactionId"] = transactionId;
-					data["OrderLineItemId"] = orderLineItemId;
-					data["Title"] = itemSummary.Title;
-					data["Seller"] = itemSummary.Seller;
-					data["GalleryImageUrl"] = itemSummary.GalleryImageUrl;
-					data["GalleryImage"] = (image == null ? null : (byte[])new ImageConverter().ConvertTo(image, typeof(byte[])));
-					data["ProfileName"] = itemSummary.ProfileName;
-					data["EndDateTime"] = itemSummary.EndDateTime;
-					data["CreateDateTime"] = DateTime.Now;
-					data["Price"] = itemSummary.Price;
-					data["TrackingNumber"] = itemSummary.TrackingNumber;
+					var data = new Dictionary<string, object>
+					{
+						["ItemId"] = itemId,
+						["TransactionId"] = transactionId,
+						["OrderLineItemId"] = orderLineItemId,
+						["Title"] = itemSummary.Title,
+						["Seller"] = itemSummary.Seller,
+						["GalleryImageUrl"] = itemSummary.GalleryImageUrl,
+						["GalleryImage"] = (image == null ? null : (byte[])new ImageConverter().ConvertTo(image, typeof(byte[]))),
+						["ProfileName"] = itemSummary.ProfileName,
+						["EndDateTime"] = itemSummary.EndDateTime,
+						["CreateDateTime"] = DateTime.Now,
+						["Price"] = itemSummary.Price,
+						["TrackingNumber"] = itemSummary.TrackingNumber
+					};
 
 					lock (DB)
 					{
@@ -429,8 +431,10 @@ namespace EbayLeaveBulkFeedback
 				itemSummary.TrackingNumber = GetTrackingNumber(itemSummary.ItemId, profileName: itemSummary.ProfileName);
 				if (itemSummary.TrackingNumber != null)
 				{
-					var data = new Dictionary<string, object>();
-					data["TrackingNumber"] = itemSummary.TrackingNumber;
+					var data = new Dictionary<string, object>
+					{
+						["TrackingNumber"] = itemSummary.TrackingNumber
+					};
 					lock (DB)
 					{
 						DB.Update("EbayItemsAwaitingFeedback", data, "ItemId='" + itemSummary.ItemId.Replace("'", "''") + "'");
@@ -790,11 +794,13 @@ namespace EbayLeaveBulkFeedback
 		{
 			try
 			{
-				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection();
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime });
+				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection
+				{
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime }
+				};
 
 				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext)
 				{

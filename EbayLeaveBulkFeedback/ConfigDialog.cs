@@ -63,7 +63,7 @@ namespace EbayLeaveBulkFeedback
 			listViewFeedbackToSellers.Items.Add(listViewItem);
 		}
 
-		private void buttonAddUserToken_Click(object sender, EventArgs e)
+		private void ButtonAddUserToken_Click(object sender, EventArgs e)
 		{
 			string newUserToken = Prompt.ShowDialog("Add eBay User Token", "Add eBay User Token");
 			if (!string.IsNullOrEmpty(newUserToken))
@@ -76,12 +76,12 @@ namespace EbayLeaveBulkFeedback
 			listViewUserTokens.Items.Add(listViewItem);
 		}
 
-		private void buttonCancel_Click(object sender, EventArgs e)
+		private void ButtonCancel_Click(object sender, EventArgs e)
 		{
 			this.Close();
 		}
 
-		private void buttonSave_Click(object sender, EventArgs e)
+		private void ButtonSave_Click(object sender, EventArgs e)
 		{
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -137,7 +137,7 @@ namespace EbayLeaveBulkFeedback
 			this.Close();
 		}
 
-		private void buttonRemoveUserToken_Click(object sender, EventArgs e)
+		private void ButtonRemoveUserToken_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem selectedItem in listViewUserTokens.SelectedItems)
 			{
@@ -145,7 +145,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void buttonRemoveFeedbackToSeller_Click(object sender, EventArgs e)
+		private void ButtonRemoveFeedbackToSeller_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem selectedItem in listViewFeedbackToSellers.SelectedItems)
 			{
@@ -153,7 +153,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void buttonAddFeedbackToSeller_Click(object sender, EventArgs e)
+		private void ButtonAddFeedbackToSeller_Click(object sender, EventArgs e)
 		{
 			string newFeedbackToSellers = Prompt.ShowDialog("Add Feedback To Sellers", "Add Feedback To Sellers");
 			if (!string.IsNullOrEmpty(newFeedbackToSellers))
@@ -166,11 +166,11 @@ namespace EbayLeaveBulkFeedback
 			listViewFeedbackToSellers.Items.Add(listViewItem);
 		}
 
-		private void buttonEditUserToken_Click(object sender, EventArgs e)
+		private void ButtonEditUserToken_Click(object sender, EventArgs e)
 		{
-			editSelectedUserTokens();
+			EditSelectedUserTokens();
 		}
-		private void editSelectedUserTokens()
+		private void EditSelectedUserTokens()
 		{
 			foreach (ListViewItem listViewItem in listViewUserTokens.SelectedItems)
 			{
@@ -181,17 +181,17 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void listViewUserTokens_DoubleClick(object sender, EventArgs e)
+		private void ListViewUserTokens_DoubleClick(object sender, EventArgs e)
 		{
-			editSelectedUserTokens();
+			EditSelectedUserTokens();
 		}
 
-		private void buttonEditFeedbackToSeller_Click(object sender, EventArgs e)
+		private void ButtonEditFeedbackToSeller_Click(object sender, EventArgs e)
 		{
-			editSelectedFeedbackToSellers();
+			EditSelectedFeedbackToSellers();
 		}
 
-		private void editSelectedFeedbackToSellers()
+		private void EditSelectedFeedbackToSellers()
 		{
 			foreach (ListViewItem listViewItem in listViewFeedbackToSellers.SelectedItems)
 			{
@@ -203,12 +203,12 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void listViewFeedbackToSellers_DoubleClick(object sender, EventArgs e)
+		private void ListViewFeedbackToSellers_DoubleClick(object sender, EventArgs e)
 		{
-			editSelectedFeedbackToSellers();
+			EditSelectedFeedbackToSellers();
 		}
 
-		private void buttonRequestToken_Click(object sender, EventArgs e)
+		private void ButtonRequestToken_Click(object sender, EventArgs e)
 		{
 			var sessionId = _dataManager.GetEbaySessionId();
 		}

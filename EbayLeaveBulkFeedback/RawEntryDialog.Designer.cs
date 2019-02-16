@@ -78,7 +78,7 @@
 			this.textBoxRawData.Size = new System.Drawing.Size(576, 417);
 			this.textBoxRawData.TabIndex = 8;
 			this.textBoxRawData.Text = "Place raw list of item IDs here...";
-			this.textBoxRawData.TextChanged += new System.EventHandler(this.textBoxRawData_TextChanged);
+			this.textBoxRawData.TextChanged += new System.EventHandler(this.TextBoxRawData_TextChanged);
 			// 
 			// btnAdd
 			// 
@@ -89,7 +89,7 @@
 			this.btnAdd.TabIndex = 9;
 			this.btnAdd.Text = "Add";
 			this.btnAdd.UseVisualStyleBackColor = true;
-			this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+			this.btnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
 			// 
 			// btnCancel
 			// 
@@ -100,7 +100,7 @@
 			this.btnCancel.TabIndex = 10;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
 			// label1
 			// 

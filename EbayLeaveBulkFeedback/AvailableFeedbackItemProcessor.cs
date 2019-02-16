@@ -52,8 +52,10 @@ namespace EbayLeaveBulkFeedback
 
 			var getItemsAwaitingFeedback = new GetItemsAwaitingFeedbackCall(apiContext);
 
-			PaginationType paginationType = new PaginationType();
-			paginationType.EntriesPerPage = 100;
+			PaginationType paginationType = new PaginationType
+			{
+				EntriesPerPage = 100
+			};
 			getItemsAwaitingFeedback.Pagination = paginationType;
 			PaginatedTransactionArrayType awaitingFeedbackItems = null;
 
@@ -113,7 +115,7 @@ namespace EbayLeaveBulkFeedback
 						//	feedbackUpdate(awaitingFeedbackItem.Item.ItemID, updates);
 						//}
 					}
-					catch (Exception ex)
+					catch //(Exception ex)
 					{
 					}
 				});

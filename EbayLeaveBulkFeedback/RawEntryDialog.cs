@@ -49,7 +49,7 @@ namespace EbayLeaveBulkFeedback
 		}
 
 
-		private void textBoxRawData_TextChanged(object sender, EventArgs e)
+		private void TextBoxRawData_TextChanged(object sender, EventArgs e)
 		{
 			UpdateRawEntryListViewAsync();
 		}
@@ -110,7 +110,7 @@ namespace EbayLeaveBulkFeedback
 				Invoke((MethodInvoker)(() => { RawEntryListViewChanged(); }));
 		}
 
-		private void btnAdd_Click(object sender, EventArgs e)
+		private void BtnAdd_Click(object sender, EventArgs e)
 		{
 			try
 			{
@@ -134,7 +134,7 @@ namespace EbayLeaveBulkFeedback
 			}
 		}
 
-		private void btnCancel_Click(object sender, EventArgs e)
+		private void BtnCancel_Click(object sender, EventArgs e)
 		{
 			try
 			{

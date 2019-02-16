@@ -98,7 +98,7 @@
 			this.buttonAddUserToken.TabIndex = 19;
 			this.buttonAddUserToken.Text = "Add...";
 			this.buttonAddUserToken.UseVisualStyleBackColor = true;
-			this.buttonAddUserToken.Click += new System.EventHandler(this.buttonAddUserToken_Click);
+			this.buttonAddUserToken.Click += new System.EventHandler(this.ButtonAddUserToken_Click);
 			// 
 			// buttonRemoveUserToken
 			// 
@@ -109,7 +109,7 @@
 			this.buttonRemoveUserToken.TabIndex = 18;
 			this.buttonRemoveUserToken.Text = "Remove Selected";
 			this.buttonRemoveUserToken.UseVisualStyleBackColor = true;
-			this.buttonRemoveUserToken.Click += new System.EventHandler(this.buttonRemoveUserToken_Click);
+			this.buttonRemoveUserToken.Click += new System.EventHandler(this.ButtonRemoveUserToken_Click);
 			// 
 			// listViewUserTokens
 			// 
@@ -126,7 +126,7 @@
 			this.listViewUserTokens.TabIndex = 8;
 			this.listViewUserTokens.UseCompatibleStateImageBehavior = false;
 			this.listViewUserTokens.View = System.Windows.Forms.View.Details;
-			this.listViewUserTokens.DoubleClick += new System.EventHandler(this.listViewUserTokens_DoubleClick);
+			this.listViewUserTokens.DoubleClick += new System.EventHandler(this.ListViewUserTokens_DoubleClick);
 			// 
 			// EbayUserToken
 			// 
@@ -142,7 +142,7 @@
 			this.buttonRequestToken.TabIndex = 17;
 			this.buttonRequestToken.Text = "Request Token...";
 			this.buttonRequestToken.UseVisualStyleBackColor = true;
-			this.buttonRequestToken.Click += new System.EventHandler(this.buttonRequestToken_Click);
+			this.buttonRequestToken.Click += new System.EventHandler(this.ButtonRequestToken_Click);
 			// 
 			// groupBox2
 			// 
@@ -169,7 +169,7 @@
 			this.buttonAddFeedbackToSeller.TabIndex = 19;
 			this.buttonAddFeedbackToSeller.Text = "Add...";
 			this.buttonAddFeedbackToSeller.UseVisualStyleBackColor = true;
-			this.buttonAddFeedbackToSeller.Click += new System.EventHandler(this.buttonAddFeedbackToSeller_Click);
+			this.buttonAddFeedbackToSeller.Click += new System.EventHandler(this.ButtonAddFeedbackToSeller_Click);
 			// 
 			// buttonRemoveFeedbackToSeller
 			// 
@@ -180,7 +180,7 @@
 			this.buttonRemoveFeedbackToSeller.TabIndex = 18;
 			this.buttonRemoveFeedbackToSeller.Text = "Remove Selected";
 			this.buttonRemoveFeedbackToSeller.UseVisualStyleBackColor = true;
-			this.buttonRemoveFeedbackToSeller.Click += new System.EventHandler(this.buttonRemoveFeedbackToSeller_Click);
+			this.buttonRemoveFeedbackToSeller.Click += new System.EventHandler(this.ButtonRemoveFeedbackToSeller_Click);
 			// 
 			// listViewFeedbackToSellers
 			// 
@@ -197,7 +197,7 @@
 			this.listViewFeedbackToSellers.TabIndex = 8;
 			this.listViewFeedbackToSellers.UseCompatibleStateImageBehavior = false;
 			this.listViewFeedbackToSellers.View = System.Windows.Forms.View.Details;
-			this.listViewFeedbackToSellers.DoubleClick += new System.EventHandler(this.listViewFeedbackToSellers_DoubleClick);
+			this.listViewFeedbackToSellers.DoubleClick += new System.EventHandler(this.ListViewFeedbackToSellers_DoubleClick);
 			// 
 			// Feedback
 			// 
@@ -213,7 +213,7 @@
 			this.buttonSave.TabIndex = 20;
 			this.buttonSave.Text = "Save";
 			this.buttonSave.UseVisualStyleBackColor = true;
-			this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
+			this.buttonSave.Click += new System.EventHandler(this.ButtonSave_Click);
 			// 
 			// buttonCancel
 			// 
@@ -224,7 +224,7 @@
 			this.buttonCancel.TabIndex = 21;
 			this.buttonCancel.Text = "Cancel";
 			this.buttonCancel.UseVisualStyleBackColor = true;
-			this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+			this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
 			// 
 			// buttonEditUserToken
 			// 
@@ -235,7 +235,7 @@
 			this.buttonEditUserToken.TabIndex = 20;
 			this.buttonEditUserToken.Text = "Edit Selected...";
 			this.buttonEditUserToken.UseVisualStyleBackColor = true;
-			this.buttonEditUserToken.Click += new System.EventHandler(this.buttonEditUserToken_Click);
+			this.buttonEditUserToken.Click += new System.EventHandler(this.ButtonEditUserToken_Click);
 			// 
 			// buttonEditFeedbackToSeller
 			// 
@@ -246,7 +246,7 @@
 			this.buttonEditFeedbackToSeller.TabIndex = 21;
 			this.buttonEditFeedbackToSeller.Text = "Edit Selected...";
 			this.buttonEditFeedbackToSeller.UseVisualStyleBackColor = true;
-			this.buttonEditFeedbackToSeller.Click += new System.EventHandler(this.buttonEditFeedbackToSeller_Click);
+			this.buttonEditFeedbackToSeller.Click += new System.EventHandler(this.ButtonEditFeedbackToSeller_Click);
 			// 
 			// tabControl1
 			// 

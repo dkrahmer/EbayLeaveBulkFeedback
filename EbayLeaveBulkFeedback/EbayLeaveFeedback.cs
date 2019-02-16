@@ -41,16 +41,17 @@ namespace EbayLeaveBulkFeedback
 		{
 			string baseMessage = (profileName == null ? string.Empty : "Profile " + profileName + ": ");
 			string baseMessageGettingListOfItems = "Getting list of item transactions that need feedback...";
-			if (generalStatusUpdate != null)
-				generalStatusUpdate(baseMessage + baseMessageGettingListOfItems, 0);
+			generalStatusUpdate?.Invoke(baseMessage + baseMessageGettingListOfItems, 0);
 
 			var feedbackToSellers = ConfigurationManager.AppSettings["FeedbackToSellers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 			var feedbackToBuyers = ConfigurationManager.AppSettings["FeedbackToBuyers"].Split('\n').Select(x => x.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
 
 			var getItemsAwaitingFeedback = new GetItemsAwaitingFeedbackCall(apiContext);
 
-			PaginationType paginationType = new PaginationType();
-			paginationType.EntriesPerPage = 100;
+			PaginationType paginationType = new PaginationType
+			{
+				EntriesPerPage = 100
+			};
 			getItemsAwaitingFeedback.Pagination = paginationType;
 			PaginatedTransactionArrayType awaitingFeedbackItems = null;
 
@@ -66,13 +67,10 @@ namespace EbayLeaveBulkFeedback
 			var uniqueItemIdsFound = new HashSet<string>();
 			do
 			{
-				if (generalStatusUpdate != null)
-				{
-					generalStatusUpdate(baseMessage + baseMessageGettingListOfItems + " Page "
-						+ paginationType.PageNumber.ToString()
-						+ (awaitingFeedbackItems == null ? string.Empty
-							: (" of " + awaitingFeedbackItems.PaginationResult.TotalNumberOfPages.ToString())), null);
-				}
+				generalStatusUpdate?.Invoke(baseMessage + baseMessageGettingListOfItems + " Page "
+					+ paginationType.PageNumber.ToString()
+					+ (awaitingFeedbackItems == null ? string.Empty
+						: (" of " + awaitingFeedbackItems.PaginationResult.TotalNumberOfPages.ToString())), null);
 				awaitingFeedbackItems = getItemsAwaitingFeedback.GetItemsAwaitingFeedback(ItemSortTypeCodeType.EndTime, paginationType);
 				if (generalStatusUpdate != null)
 				{
@@ -133,11 +131,13 @@ namespace EbayLeaveBulkFeedback
 					int percentComplete = 50 + (((feedbackItemNumber * 100) / allAwaitingFeedbackItems.Count) / 2);
 					generalStatusUpdate(baseMessage + "Giving feedback to [" + giveFeedbackTo + "] for item: " + feedbackItem.Item.Title + " (" + feedbackItem.Item.ItemID + ")", percentComplete);
 				}
-				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection();
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges });
-				itemRatingDetailsTypeCollection.Add(new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime });
+				var itemRatingDetailsTypeCollection = new ItemRatingDetailsTypeCollection
+				{
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.Communication },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ItemAsDescribed },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingAndHandlingCharges },
+					new ItemRatingDetailsType() { Rating = 5, RatingDetail = FeedbackRatingDetailCodeType.ShippingTime }
+				};
 
 				var leaveFeedbackCall = new LeaveFeedbackCall(apiContext);
 
@@ -177,10 +177,8 @@ namespace EbayLeaveBulkFeedback
 					}
 					feedbackCount++;
 				}
-				catch (Exception ex)
+				catch //(Exception ex)
 				{
-					int i = 0;
-					i++;
 				}
 
 				feedbackItemNumber++;

@@ -70,8 +70,16 @@ namespace EbayLeaveBulkFeedback
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			ResetGui();
-			//_dataManager.UpdateFeedbackListViewAsync();
-			_dataManager.InitPickListView();
+			RefreshPickList();
+		}
+
+		private void AfterLeaveFeedback()
+		{
+			Invoke((MethodInvoker)(() =>
+			{
+				RefreshPickList();
+				ResetGui();
+			}));
 		}
 
 		private void ResetGui()
@@ -91,7 +99,7 @@ namespace EbayLeaveBulkFeedback
 		private void ButtonLeaveFeedback_Click(object sender, EventArgs e)
 		{
 			_leaveFeedbackThread = _dataManager.LeaveFeedbacksAsync(() => { EnableDisableAll(false); },
-				ResetGui,
+				AfterLeaveFeedback,
 				GeneralStatusUpdate);
 		}
 
@@ -99,9 +107,14 @@ namespace EbayLeaveBulkFeedback
 		{
 			Invoke((MethodInvoker)(() =>
 			{
-				//textBoxRawData.Enabled = enabled;
-				buttonLeaveFeedback.Enabled = enabled;
-				buttonStop.Enabled = !enabled;
+				buttonLeaveFeedback.Enabled = enabled;  // handled first to set focus correctly
+				buttonStop.Enabled = !enabled;          // handled first to set focus correctly
+
+				splitContainer1.Enabled = enabled;
+				buttonRawEntry.Enabled = enabled;
+				buttonConfig.Enabled = enabled;
+				buttonIgnoreSelected.Enabled = enabled;
+				buttonClearCompleted.Enabled = enabled;
 			}));
 		}
 
@@ -347,6 +360,11 @@ namespace EbayLeaveBulkFeedback
 		}
 
 		private void ButtonRefresh_Click(object sender, EventArgs e)
+		{
+			RefreshPickList();
+		}
+
+		private void RefreshPickList()
 		{
 			_dataManager.InitPickListView();
 		}

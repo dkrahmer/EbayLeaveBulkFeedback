@@ -47,7 +47,7 @@ namespace EbayLeaveBulkFeedback
 			this.buttonStop = new System.Windows.Forms.Button();
 			this.toolStripItemCount = new System.Windows.Forms.Label();
 			this.buttonClearCompleted = new System.Windows.Forms.Button();
-			this.btnRawEntry = new System.Windows.Forms.Button();
+			this.buttonRawEntry = new System.Windows.Forms.Button();
 			this.buttonIgnoreSelected = new System.Windows.Forms.Button();
 			this.buttonConfig = new System.Windows.Forms.Button();
 			this.pickListView = new EbayLeaveBulkFeedback.ListViewNonFlicker();
@@ -253,15 +253,15 @@ namespace EbayLeaveBulkFeedback
 			// 
 			// btnRawEntry
 			// 
-			this.btnRawEntry.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.btnRawEntry.Location = new System.Drawing.Point(92, 744);
-			this.btnRawEntry.Margin = new System.Windows.Forms.Padding(2);
-			this.btnRawEntry.Name = "btnRawEntry";
-			this.btnRawEntry.Size = new System.Drawing.Size(105, 37);
-			this.btnRawEntry.TabIndex = 18;
-			this.btnRawEntry.Text = "Raw Entry...";
-			this.btnRawEntry.UseVisualStyleBackColor = true;
-			this.btnRawEntry.Click += new System.EventHandler(this.BtnRawEntry_Click);
+			this.buttonRawEntry.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.buttonRawEntry.Location = new System.Drawing.Point(92, 744);
+			this.buttonRawEntry.Margin = new System.Windows.Forms.Padding(2);
+			this.buttonRawEntry.Name = "btnRawEntry";
+			this.buttonRawEntry.Size = new System.Drawing.Size(105, 37);
+			this.buttonRawEntry.TabIndex = 18;
+			this.buttonRawEntry.Text = "Raw Entry...";
+			this.buttonRawEntry.UseVisualStyleBackColor = true;
+			this.buttonRawEntry.Click += new System.EventHandler(this.BtnRawEntry_Click);
 			// 
 			// buttonIgnoreSelected
 			// 
@@ -424,7 +424,7 @@ namespace EbayLeaveBulkFeedback
 			this.Controls.Add(this.splitContainer1);
 			this.Controls.Add(this.buttonConfig);
 			this.Controls.Add(this.buttonIgnoreSelected);
-			this.Controls.Add(this.btnRawEntry);
+			this.Controls.Add(this.buttonRawEntry);
 			this.Controls.Add(this.buttonClearCompleted);
 			this.Controls.Add(this.toolStripItemCount);
 			this.Controls.Add(this.buttonStop);
@@ -463,7 +463,7 @@ namespace EbayLeaveBulkFeedback
 		private System.Windows.Forms.ColumnHeader Result;
 		private System.Windows.Forms.Label toolStripItemCount;
 		private System.Windows.Forms.Button buttonClearCompleted;
-		private System.Windows.Forms.Button btnRawEntry;
+		private System.Windows.Forms.Button buttonRawEntry;
 		private ListViewNonFlicker feedbackListView;
 		private System.Windows.Forms.ColumnHeader TransactionId;
 		private System.Windows.Forms.ColumnHeader ProfileName;

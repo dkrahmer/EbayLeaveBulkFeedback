@@ -151,8 +151,12 @@ namespace EbayLeaveBulkFeedback
 			{
 				string status = listViewItem.SubItems[0].Text;
 				if (status == "Done" || status == "Ignore")
-					Invoke((MethodInvoker)(() => { feedbackListView.Items.Remove(listViewItem); }));
+				{
+					string itemId = listViewItem.SubItems[FEEDBACK_SUBITEM_ITEM_ID].Text;
+					_dataManager.RemoveListingId(itemId);
+				}
 			}
+			_dataManager.UpdateFeedbackListViewAsync();
 		}
 
 
